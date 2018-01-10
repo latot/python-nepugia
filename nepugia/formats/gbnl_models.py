@@ -24,6 +24,31 @@
 
 from construct import *
 
+# unsure of order of agi/men/luk
+CharStats = Struct('stats',
+    ULInt32('hit_points'),
+    Padding(4),
+    ULInt32('skill_points'),
+    ULInt32('strength'),
+    ULInt32('vitality'),
+    ULInt32('intelligence'),
+    ULInt32('mentality'),
+    ULInt32('agility'),
+    ULInt32('technique'),
+    Padding(4),
+    ULInt32('luck'),
+    ULInt32('movement'),
+    Padding(4),
+    Struct('resist',
+        SLInt32('element_00'),
+        SLInt32('element_01'),
+        SLInt32('element_02'),
+        SLInt32('element_03')
+    ),
+
+    Pass
+)
+
 # row_size=292
 ItemModel = Struct('item',
     # looks like some kind of bit field/flags

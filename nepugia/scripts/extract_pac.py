@@ -40,38 +40,30 @@ def main():
 
 def extract_pac_file(src_file, dest_dir):
     get_target_path = lambda p: os.path.join(dest_dir, p.replace('\\', '/'))
-
     logger.info('Opening PAC file: %s', src_file)
     with open(src_file) as pac_handle:
         pac_data = PACFormat.parse_stream(pac_handle)
         hc = HuffmanCoding()
-
         logger.info('Parsed %03d entries', len(pac_data.entries))
-
         for entry in pac_data.entries:
             target_path = get_target_path(entry.name)
-
             logger.debug('Found entry: id=%03d offset=0x%08X compressed=%d',
                 entry.id, entry.offset, entry.compression_flag)
             logger.info('Unpacking entry "%s" @ %06d bytes to "%s" @ %06d bytes',
                 entry.name, entry.stored_size, target_path, entry.real_size)
-
             try:
                 os.makedirs(os.path.dirname(target_path))
             except OSError:
                 pass
-
             with open(target_path, 'w') as target_file:
                 with entry.vf_open(pac_handle) as entry_handle:
                     if entry.compression_flag:
                         chunk_set = entry.chunk_set.value
                         logger.info('Parsed %03d chunks of %08d bytes @ offset=0x%08X',
                             chunk_set.header.chunk_count, chunk_set.header.chunk_size, chunk_set.header.header_size)
-
                         for i, chunk in enumerate(chunk_set.chunks):
                             logger.info('Decompressing chunk #%03d @ %06d -> %06d bytes',
                                 i, chunk.stored_size, chunk.real_size)
-
                             with chunk.vf_open(entry_handle) as chunk_handle:
                                 try:
                                     hc.decompress_stream(

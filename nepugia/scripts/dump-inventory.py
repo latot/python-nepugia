@@ -3,19 +3,16 @@ import sys
 import os.path
 import glob
 
-item_db_files = glob.glob('/run/media/aheadley/16F9-2F2F/rebirth2-extracted-data/*/database/stitem*.gbin')
+item_db_files = glob.glob('/run/media/pipe/B4F49A1CF499E0C2/Program Files (x86)/Steam/steamapps/common/Neptunia Rebirth1/data/SYSTEM00000/database/stitem.gbin')
 items = {}
 
 for item_db_fn in item_db_files:
     print item_db_fn
     with open(item_db_fn) as f:
         item_data = GBNLFormat(ItemModel).parse_stream(f)
-
     item_strings = {s.v_relative_offset: s.value for s in item_data.strings}
-
     for item_row in item_data.rows:
         item_row.name = item_strings[item_row.name_offset]
-
     items.update({row.id: row for row in item_data.rows})
 
 # items = {row.id: row for row in item_data.rows}
@@ -23,7 +20,6 @@ for item_db_fn in item_db_files:
 for fn in sys.argv[1:]:
     with open(fn) as f:
         data = RB2_SAVFormat.parse_stream(f)
-
     print fn
     for i, item_tuple in enumerate(data.inventory.slots):
         item_id, count = item_tuple.item_id, item_tuple.count

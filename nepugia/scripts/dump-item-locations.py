@@ -50,24 +50,19 @@ if __name__ == '__main__':
     import sys
     import os.path
     import argparse
-
     parser = argparse.ArgumentParser()
     parser.add_argument('--no-change-dungeon', default=False, action='store_true')
     parser.add_argument('db_dir')
     parser.add_argument('output_file')
-
     args = parser.parse_args()
-
     with open(args.output_file, 'w') as out_file:
         write = lambda line, *args: out_file.write(line.format(*args) + '\n')
-
         with open(os.path.join(args.db_dir, 'stitem.gbin')) as item_file:
             item_db = GBNLFormat(ItemModel).parse_stream(item_file)
         with open(os.path.join(args.db_dir, 'stcharamonster.gbin')) as monster_file:
             monster_db = GBNLFormat(CharaMonsterModel).parse_stream(monster_file)
         with open(os.path.join(args.db_dir, 'stdungeon.gbin')) as dungeon_file:
             dungeon_db = GBNLFormat(DungeonModel).parse_stream(dungeon_file)
-
         write('| Name | HP | Drops | XP | Credits |')
         write('|---|---|---|---|---|')
         for dungeon in dungeon_db.rows: #skip the first one and last because they are garbage
@@ -80,31 +75,25 @@ if __name__ == '__main__':
             change_monster_ids = uniq(m.id \
                 for spawn in dungeon.monster_spawn_sets[2].monster_spawns \
                     for m in spawn.monsters) - normal_monster_ids
-
             normal_monster_ids = list(normal_monster_ids)
             add_monster_ids = list(add_monster_ids)
             change_monster_ids = list(change_monster_ids)
-
             if normal_monster_ids:
                 write('| **{}** |---|---|---|---|', lookup_string(dungeon.name_offset, dungeon_db))
-
                 for monster in sorted((lookup_by_id(mid, monster_db.rows) for mid in normal_monster_ids), key=lambda m: m.stats.hit_points):
                     drop_items = ['[%s]' % lookup_string(lookup_by_id(iid, item_db.rows).name_offset, item_db) \
                         for iid in uniq([monster.drop_item_00, monster.drop_item_01, monster.drop_item_02])]
                     write('| {} | {} | {} | {} | {} |',
                         monster.name, monster.stats.hit_points, ', '.join(drop_items),
                         monster.drop_exp, monster.drop_credits)
-
                 for monster in sorted((lookup_by_id(mid, monster_db.rows) for mid in add_monster_ids), key=lambda m: m.stats.hit_points):
                     drop_items = ['[%s]' % lookup_string(lookup_by_id(iid, item_db.rows).name_offset, item_db) \
                         for iid in uniq([monster.drop_item_00, monster.drop_item_01, monster.drop_item_02])]
                     write('| *{}* | {} | {} | {} | {} |',
                         monster.name, monster.stats.hit_points, ', '.join(drop_items),
                         monster.drop_exp, monster.drop_credits)
-
             if change_monster_ids and not args.no_change_dungeon:
                 write('| **{} (Change Dungeon)** |---|---|---|---|', lookup_string(dungeon.name_offset, dungeon_db))
-
                 try:
                     for monster in sorted((lookup_by_id(mid, monster_db.rows) for mid in change_monster_ids), key=lambda m: m.stats.hit_points):
                         drop_items = ['[%s]' % lookup_string(lookup_by_id(iid, item_db.rows).name_offset, item_db) \
