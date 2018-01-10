@@ -36,9 +36,7 @@ def main():
     parser.add_argument('-r', '--rows', action='store_true', default=False)
     parser.add_argument('-o', '--one-line', action='store_true', default=False)
     parser.add_argument('files', nargs='+')
-
     args = parser.parse_args()
-
     run_data(args)
 
 def run_data(args):
@@ -48,7 +46,6 @@ def run_data(args):
                 fmt_parser = FORMATS[args.format](ROW_MODELS[args.model])
             else:
                 fmt_parser = FORMATS[args.format]
-
             parsed_file = fmt_parser.parse_stream(file_handle)
             print fn
             if args.one_line:
