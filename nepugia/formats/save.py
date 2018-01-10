@@ -26,18 +26,18 @@ from construct import *
 
 RB2_SAVFormat = Struct('rb2_sav',
     Struct('header',
-        ULInt16('game_id'),
-        ULInt16('save_slot_id'),
+        'game_id' / Int16ul,
+        'save_slot_id' / Int16ul,
 
         Padding(8),
 
-        ULInt32('save_count'),
+        'save_count' / Int32ul,
         Padding(4),
-        Magic('\xD0\xB0\x0C\x00'),
+        Const('\xD0\xB0\x0C\x00'),
         # only seems to be 3, 7, or 10
-        ULInt32('unknown_01'),
-        LFloat32('cursor_pos_x'),
-        LFloat32('cursor_pos_y'),
+        'unknown_01' / Int32ul,
+        'cursor_pos_x' / Float32l,
+        'cursor_pos_y' / Float32l),
 
         # Padding(3784),
         Padding(3548),
@@ -46,48 +46,48 @@ RB2_SAVFormat = Struct('rb2_sav',
         Struct('game_stats',
             Padding(60),
 
-            ULInt32('battle_count'),
-            ULInt32('kill_count'),
+            'battle_count' / Int32ul,
+            'kill_count' / Int32ul,
             # suspect one of these is per-cycle
-            ULInt32('cycle_kill_count'),
-            ULInt32('ko_count'),
-            ULInt32('escape_count'),
-            ULInt32('hdd_activation_count'),
-            ULInt32('max_damage_dealt'),
-            ULInt32('max_combo_dealt'),
+            'cycle_kill_count' / Int32ul,
+            'ko_count' / Int32ul,
+            'escape_count' / Int32ul,
+            'hdd_activation_count' / Int32ul,
+            'max_damage_dealt' / Int32ul,
+            'max_combo_dealt' / Int32ul,
 
             # always seems to be 0
             Padding(4),
 
-            ULInt32('total_damage_dealt'),
+            'total_damage_dealt' / Int32ul,
 
             Padding(4),
 
-            ULInt32('total_damage_taken'),
+            'total_damage_taken' / Int32ul,
 
             Padding(12),
-            Array(4, SLInt32('unknown_12')),
+            Array(4, 'unknown_12' / Int32sl),
 
-            ULInt32('jump_count'),
+            'jump_count' / Int32ul,
 
             Padding(4),
-            ULInt32('unknown_14'),
+            'unknown_14' / Int32ul,
 
-            ULInt32('rush_attack_count'),
-            ULInt32('power_attack_count'),
-            ULInt32('break_attack_count'),
+            'rush_attack_count' / Int32ul,
+            'power_attack_count' / Int32ul,
+            'break_attack_count' / Int32ul,
 
-            Array(5, SLInt32('unknown_15')),
+            Array(5, 'unknown_15' / Int32sl),
 
-            ULInt32('credits_spent'),
+            'credits_spent' / Int32ul,
             # Array(4, SLInt16('unknown_18')),
             Padding(8),
-            ULInt32('credits_gained'),
+            'credits_gained' / Int32ul,
             Padding(4),
-            ULInt32('credits_spent2'),
+            'credits_spent2' / Int32ul,
 
             Padding(16),
-            ULInt32('quests_completed_count'),
+            'quests_completed_count' / Int32ul,
             Padding(12),
         ),
         # Array(59, SLInt32('unknown_10')),
@@ -108,22 +108,22 @@ RB2_SAVFormat = Struct('rb2_sav',
         Padding(8),
         String('name', 32, padchar='\x00'),
 
-        ULInt32('xp_total'),
-        ULInt16('unknown_22'),
-        ULInt16('level'),
+        'xp_total' / Int32ul,
+        'unknown_22' / Int16ul,
+        'level' / Int16ul,
         # Array(4, ULInt16('unknown_12')),
         Padding(8),
         # this is some kind of id, maybe in stcharaplayer
-        ULInt32('unknown_20'),
-        ULInt32('unknown_21'),
+        'unknown_20' / Int32ul,
+        'unknown_21' / Int32ul,
         # this and the sp seem to be the current values (i.e. could be lower
         # if saved in a dungeon, could be higher if at full health since it
         # includes equipment bonuses)
-        ULInt32('current_hp'),
+        'current_hp' / Int32ul,
         # seems to always be 0
         # ULInt32('unknown_23'),
         Padding(4),
-        ULInt32('current_sp'),
+        'current_sp' / Int32ul,
         # seems to always be 100 so not going to record it
         # ULInt32('unknown_25'),
         Padding(4),
@@ -131,43 +131,43 @@ RB2_SAVFormat = Struct('rb2_sav',
         # these seem to be the base stats before equipment bonuses
         # unsure of order of agi/men/luk
         Struct('stats',
-            ULInt32('hit_points'),
+            'hit_points' / Int32ul,
             Padding(4),
-            ULInt32('skill_points'),
-            ULInt32('strength'),
-            ULInt32('vitality'),
-            ULInt32('intelligence'),
-            ULInt32('mentality'),
-            ULInt32('agility'),
-            ULInt32('technique'),
+            'skill_points' / Int32ul,
+            'strength' / Int32ul,
+            'vitality' / Int32ul,
+            'intelligence' / Int32ul,
+            'mentality' / Int32ul,
+            'agility' / Int32ul,
+            'technique' / Int32ul,
             Padding(4),
-            ULInt32('luck'),
-            ULInt32('movement'),
+            'luck' / Int32ul,
+            'movement' / Int32ul,
             Padding(4),
             Struct('resist',
-                SLInt32('element_00'),
-                SLInt32('element_01'),
-                SLInt32('element_02'),
-                SLInt32('element_03')
+                'element_00' / Int32sl,
+                'element_01' / Int32sl,
+                'element_02' / Int32sl,
+                'element_03' / Int32sl
             ),
         ),
 
         Padding(20),
         Struct('equipment',
-            ULInt32('unknown_30'),
+            'unknown_30' / Int32ul,
 
-            ULInt32('weapon_id'),
-            ULInt32('armor_id'),
-            ULInt32('bracelet_id'),
-            ULInt32('clothing_id'),
-            ULInt32('accessory_id'),
+            'weapon_id' / Int32ul,
+            'armor_id' / Int32ul,
+            'bracelet_id' / Int32ul,
+            'clothing_id' / Int32ul,
+            'accessory_id' / Int32ul,
 
-            ULInt32('cpu_c_id'),
-            ULInt32('cpu_h_id'),
-            ULInt32('cpu_b_id'),
-            ULInt32('cpu_s_id'),
-            ULInt32('cpu_w_id'),
-            ULInt32('cpu_l_id'),
+            'cpu_c_id' / Int32ul,
+            'cpu_h_id' / Int32ul,
+            'cpu_b_id' / Int32ul,
+            'cpu_s_id' / Int32ul,
+            'cpu_w_id' / Int32ul,
+            'cpu_l_id' / Int32ul,
         ),
 
         Padding(1072),
@@ -177,10 +177,10 @@ RB2_SAVFormat = Struct('rb2_sav',
     Padding(19564),
     # @51788
     Struct('inventory',
-        ULInt32('filled_slot_count'),
+        'filled_slot_count' / Int32ul,
         Array(3000, Struct('slots',
-            ULInt16('item_id'),
-            ULInt8('count'),
+            'item_id' / Int16ul,
+            'count' / Int8ul,
             BitStruct('flags',
                 Padding(5),
                 # this one seems exclusive to plans, but not all plans have it
@@ -193,7 +193,7 @@ RB2_SAVFormat = Struct('rb2_sav',
         )),
 
         # @63792
-        ULInt32('current_credits'),
+        'current_credits' / Int32ul,
     ),
 
 
@@ -213,19 +213,19 @@ RB2_SAVFormat = Struct('rb2_sav',
 
     # @831664
     Struct('footer',
-        Magic('\x01\x00\x00\x00'),
-        Magic('\x12\x32'),
-        Magic('\x50\x46'),
+        Const('\x01\x00\x00\x00'),
+        Const('\x12\x32'),
+        Const('\x50\x46'),
         Padding(8),
-        Magic('\xFF\xCB\xE5\x00'),
-        Array(4, ULInt16('unknown_99')),
+        Const('\xFF\xCB\xE5\x00'),
+        Array(4, 'unknown_99' / Int16ul),
     ),
 
     Padding(4),
 )
 
 SAVSlotFormat = Struct('savslot',
-    Magic('SAVE0001'),
+    Const('SAVE0001'),
 
     # there might be some meaning to this, but is probably specific to ps3/vita
     # maybe CRCs?
@@ -242,14 +242,14 @@ SAVSlotFormat = Struct('savslot',
     Padding(8),
 
     Struct('timestamp',
-        ULInt16('year'),
-        ULInt16('month'),
-        ULInt16('day'),
+        'year' / Int16ul,
+        'month' / Int16ul,
+        'day' / Int16ul,
 
-        ULInt16('hour'),
-        ULInt16('minute'),
-        ULInt16('second'),
+        'hour' / Int16ul,
+        'minute' / Int16ul,
+        'second' / Int16ul,
 
-        ULInt32('unknown_00'),
+        'unknown_00' / Int32ul,
     ),
 )

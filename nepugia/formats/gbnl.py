@@ -30,7 +30,7 @@ def GBNLFormat(row_model=None):
         Pointer(lambda ctx: -64,
             Struct('footer',
                 Anchor('a_start'),
-                Magic('GBNL'),
+                Const('GBNL'),
 
                 # # 0x01 00 00 00
                 # Const(ULInt32('const_00'), 0x01),
@@ -44,37 +44,37 @@ def GBNLFormat(row_model=None):
                 # Const(ULInt32('const_04'), 0x00),
                 # Padding(20),
 
-                Magic('\x01\x00\x00\x00'),
-                Magic('\x10\x00\x00\x00'),
-                Magic('\x04\x00\x00\x00'),
+                Const('\x01\x00\x00\x00'),
+                Const('\x10\x00\x00\x00'),
+                Const('\x04\x00\x00\x00'),
                 # this is 1 if there are strings at the end of the file, and 0
                 # otherwise. not sure why since there is also a str_count field
-                ULInt32('has_strings_flag'),
-                Magic('\x00\x00\x00\x00'),
+                'has_strings_flag' / Int32ul,
+                Const('\x00\x00\x00\x00'),
 
                 # @0x18
                 # possible string count?
-                ULInt32('row_count'),
+                'row_count' / Int32ul,
                 # @0x1c
                 # seems to be row size
-                ULInt32('row_size'),
+                'row_size' / Int32ul,
                 # @0x20
                 # this is the id of the model to use for the rows
-                ULInt32('row_model_id'),
+                'row_model_id' / Int32ul,
                 # @0x24
                 # some other kind of offset
-                ULInt32('data_end_offset'),
+                'data_end_offset' / Int32ul,
                 # @0x28
                 # also possible string count
                 # almost certainly string count
-                ULInt32('str_count'),
+                'str_count' / Int32ul,
                 # @0x2c
                 # string offset start
-                ULInt32('str_offset'),
+                'str_offset' / Int32ul,
 
-                Value('v_offset_diff', lambda ctx: ctx.str_offset - ctx.data_end_offset),
-                Value('v_expected_data_size', lambda ctx: ctx.row_count * ctx.row_size),
-                Value('v_data_size_diff', lambda ctx: ctx.data_end_offset - ctx.v_expected_data_size),
+                Computed('v_offset_diff', lambda ctx: ctx.str_offset - ctx.data_end_offset),
+                Computed('v_expected_data_size', lambda ctx: ctx.row_count * ctx.row_size),
+                Computed('v_data_size_diff', lambda ctx: ctx.data_end_offset - ctx.v_expected_data_size),
 
                 # # @0x30
                 # Const(ULInt32('const_05'), 0x04),
@@ -101,7 +101,7 @@ def GBNLFormat(row_model=None):
             # CString('strings')
             Struct('strings',
                 Anchor('start_offset'),
-                Value('v_relative_offset', lambda ctx: ctx.start_offset - ctx._.a_strings_start),
+                Computed('v_relative_offset', lambda ctx: ctx.start_offset - ctx._.a_strings_start),
                 CString('value'),
                 Anchor('end_offset'),
             )
@@ -114,7 +114,7 @@ def GBNLFormat(row_model=None):
         Anchor('a_expected_footer_start'),
         # the footer struct would go here if we didn't need to parse it first
 
-        Value('v_strings_db', lambda ctx: {
+        Computed('v_strings_db', lambda ctx: {
             s.v_relative_offset: s.value \
             for s in ctx.strings
         }),
