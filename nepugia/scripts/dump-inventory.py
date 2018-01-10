@@ -1,4 +1,5 @@
 from nepugia import *
+from nepugia.formats.gbnl_models import *
 import sys
 import os.path
 import glob

@@ -24,6 +24,7 @@
 # SOFTWARE.
 
 from nepugia import *
+from nepugia.formats.gbnl_models import *
 
 def clean_string(value):
     return value

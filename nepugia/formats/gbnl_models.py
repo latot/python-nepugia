@@ -457,7 +457,7 @@ AvatarDecModel = Struct('avtdec',
 
 ROW_MODELS = {
     'none':         None,
-    'character':    CharStats
+    'character':    CharStats,
     'ability':      AbilityModel,
     'item':         ItemModel,
     'charamonster': CharaMonsterModel,
