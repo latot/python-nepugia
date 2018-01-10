@@ -24,6 +24,30 @@
 
 from construct import *
 
+CharStats = Struct('stats',
+    SLInt32('hit_points'),
+    Padding(4),
+    SLInt32('skill_points'),
+    SLInt32('strength'),
+    SLInt32('vitality'),
+    SLInt32('intelligence'),
+    SLInt32('mentality'),
+    SLInt32('agility'),
+    SLInt32('technique'),
+    Padding(4),
+    SLInt32('luck'),
+    SLInt32('movement'),
+    Padding(4),
+    Struct('resist',
+        SLInt32('fire'),
+        SLInt32('ice'),
+        SLInt32('wind'),
+        SLInt32('lightning')
+    ),
+
+    Pass
+)
+
 # row_size=292
 ItemModel = Struct('item',
     # looks like some kind of bit field/flags
@@ -47,31 +71,15 @@ ItemModel = Struct('item',
 
     # always 0
     Magic('\x00\x00'),
-    # small numbers, possibly levels
+    # possibly the type of item (ex katanas, broadswords, syringes...), is the only value for now can relation this
     ULInt16('game_effect_00'),
 
     # only seems to be 0, 1, or 99
     ULInt16('max_count'),
-    # large numbers, buy price maybe?
-    ULInt16('game_effect_01'),
+    ULInt32('buy price'),
+    ULInt32('sell_price'),
 
-    # possibly a character/use mask, usually 0, sometimes small (odd) numbers
-    ULInt16('game_effect_02'),
-    # large numbers, seems to always be less than game_effect_01
-    ULInt16('game_effect_03'),
-
-    # observed as all 0x00
-    Padding(110),
-    # Magic('\0' * 110),
-
-    # seems to usually be 0, otherwise is less than 10
-    ULInt16('dynamic_05'),
-    # possibly label ids
-    ULInt16('dynamic_06'),
-    # possibly string offsets
-    ULInt32('desc_offset'),
-
-    Pass
+    CharStats
 )
 
 AbilityModel = ItemModel
@@ -79,6 +87,7 @@ AbilityModel = ItemModel
 CharaMonsterModel = Struct('charamonster',
     # flag field, use unknown
     ULInt32('flag_00'),
+
     # this isn't certain, it seems to be unique but unconfirmed, and the rows
     # are completely in this order, it jumps around
     ULInt16('id'),
@@ -242,15 +251,10 @@ DungeonModel = Struct('dungeon',
     Padding(18),
 
     # @52
-    Array(10, ULInt32('dynamic_41')),
-    Array(5, Struct('treasure_boxes',
-        ULInt32('id'),
-        Array(3, Struct('drops',
-            ULInt32('item_id'),
-            ULInt32('drop_chance'),
-            ULInt32('flag_00'),
-            ULInt32('flag_01'),
-        ))
+    # Search this 10 in sttreasure.gbin
+    Array(10, ULInt32('treasure_boxes')),
+    Array(5, Struct('hidden_treasure_boxes',
+        TreasureModel
     )),
 
     # @352
@@ -281,10 +285,18 @@ DungeonModel = Struct('dungeon',
 
     # @5212
     # array totals 2340 bytes
-    Array(3, Struct('unknown_block_01',
-        Array(65, ULInt32('dynamic_30')),
+    # Gathering with Change-Items Off
+    Struct('gathering_off',
+        Array(10, TreasureModel),
         Padding(520)
-    )),
+    ),
+
+    # Gathering with Change-Items On
+    Struct('gathering_on',
+        Array(5, TreasureModel),
+        Padding(520)
+    ),
+
     ULInt32('dynamic_99'),
     Padding(16),
 
@@ -432,7 +444,7 @@ AvatarDecModel = Struct('avtdec',
 
 ROW_MODELS = {
     'none':         None,
-
+    'stats':        CharStats,
     'ability':      AbilityModel,
     'item':         ItemModel,
     'charamonster': CharaMonsterModel,

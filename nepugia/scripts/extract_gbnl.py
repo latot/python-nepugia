@@ -37,7 +37,6 @@ def extract_gbnl_rows(src_file, dest_dir):
     with open(src_file) as src_handle:
         gbnl_data = GBNLFormat().parse_stream(src_handle)
         src_handle.seek(0)
-
         for r in range(gbnl_data.footer.row_count):
             row_fn = os.path.join(dest_dir,
                 '{}-{:05d}.row'.format(os.path.basename(src_file).split('.')[0], r))

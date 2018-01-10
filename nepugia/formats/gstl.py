@@ -72,8 +72,14 @@ GSTLFormat = Struct('gstl',
             Value('v_length', lambda ctx: ctx.end_offset - ctx.start_offset),
         )
     ),
-    Padding(8),
+    Anchor('a_strings_start'),
     Array(lambda ctx: ctx.header.str_count,
-        CString('strings')
+        # CString('strings')
+        Struct('strings',
+            Anchor('start_offset'),
+            Value('v_relative_offset', lambda ctx: ctx.start_offset - ctx._.a_strings_start),
+            CString('value'),
+            Anchor('end_offset'),
+        )
     )
 )
