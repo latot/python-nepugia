@@ -56,7 +56,7 @@ def chunked_copy(read_func, write_func, chunk_size=4 * 1024):
         chunk = read()
     return bytes_copied
 
-class FileInFile(file):
+class FileInFile():
     _handle = None
     _mode = None
     _name = None

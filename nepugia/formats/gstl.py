@@ -29,57 +29,57 @@ from construct import *
 # in other files as well.
 GSTLFormat = Struct('gstl',
     Struct('header',
-        Magic('GSTL'),
+        Const('GSTL'),
 
-        Magic('\x01\x00\x00\x00'),
-        Magic('\x10\x00\x00\x00'),
-        Magic('\x04\x00\x00\x00'),
-        Magic('\x01\x00\x00\x00'),
-        Magic('\x40\x00\x00\x00'),
+        Const('\x01\x00\x00\x00'),
+        Const('\x10\x00\x00\x00'),
+        Const('\x04\x00\x00\x00'),
+        Const('\x01\x00\x00\x00'),
+        Const('\x40\x00\x00\x00'),
 
         # number of str labels (ex: IDS_SOMETHING_OR_OTHER)
         # @0x18
-        ULInt32('label_count'),
+        'label_count' / Int32ul,
 
         # these are always observed to be 12, and 3 (respectively), use is
         # unknown (year and month of creation maybe?)
-        Magic('\x0C\x00\x00\x00'),
-        Magic('\x03\x00\x00\x00'),
+        Const('\x0C\x00\x00\x00'),
+        Const('\x03\x00\x00\x00'),
 
         # end of header maybe, of end of label list
-        ULInt32('end'),
+        'end' / Int32ul,
         # total count of labels and strings
-        ULInt32('str_count'),
+        'str_count' / Int32ul,
         # @0x2c
-        ULInt32('str_offset'),
+        'str_offset' / Int32ul,
 
         # 0x04 then zeros till @0x44
-        Magic('\x04\x00\x00\x00'),
+        Const('\x04\x00\x00\x00'),
         Padding(16),
     ),
     # @0x44
     Array(lambda ctx: ctx.header.label_count,
         Struct('labels',
-            ULInt32('id'),
+            'id' / Int32ul,
             # starting offset of string
-            ULInt32('start_offset'),
+            'start_offset' / Int32ul,
             # ending offset of string
             # the final value will be 5 as a sentinal value or something
-            ULInt32('end_offset'),
+            'end_offset' / Int32ul,
             # note that this is a computed value and not present in the
             # on-disk structure, and because of the above note will not be
             # valid for the last item
-            Value('v_length', lambda ctx: ctx.end_offset - ctx.start_offset),
+            'v_length' / Computed(lambda ctx: ctx.end_offset - ctx.start_offset),
         )
     ),
-    Anchor('a_strings_start'),
+    'a_strings_start' / Tell,
     Array(lambda ctx: ctx.header.str_count,
         # CString('strings')
         Struct('strings',
-            Anchor('start_offset'),
-            Value('v_relative_offset', lambda ctx: ctx.start_offset - ctx._.a_strings_start),
+            'start_offset' / Tell,
+            'v_relative_offset' / Computed(lambda ctx: ctx.start_offset - ctx._.a_strings_start),
             CString('value'),
-            Anchor('end_offset'),
+            'end_offset' / Tell,
         )
     )
 )

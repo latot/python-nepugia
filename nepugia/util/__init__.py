@@ -35,14 +35,14 @@ except ImportError:
         # py3k
         from io import StringIO
 
-from construct import Union, ULInt32, Struct, ULInt16
+from construct import Union, Int32ul, Struct, Int16ul
 
 def FourByteUnion(name):
     return Union(name,
-        ULInt32('u32'),
+        'u32' / Int32ul,
         Struct('u16',
-            ULInt16('a'),
-            ULInt16('b'),
+            'a' / Int16ul,
+            'b' / Int16ul,
         ),
     )
 

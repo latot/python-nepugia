@@ -25,24 +25,24 @@
 from construct import *
 
 CharStats = Struct('stats',
-    SLInt32('hit_points'),
+    'hit_points' / Int32sl,
     Padding(4),
-    SLInt32('skill_points'),
-    SLInt32('strength'),
-    SLInt32('vitality'),
-    SLInt32('intelligence'),
-    SLInt32('mentality'),
-    SLInt32('agility'),
-    SLInt32('technique'),
+    'skill_points' / Int32sl,
+    'strength' / Int32sl,
+    'vitality' / Int32sl,
+    'intelligence' / Int32sl,
+    'mentality' / Int32sl,
+    'agility' / Int32sl,
+    'technique' / Int32sl,
     Padding(4),
-    SLInt32('luck'),
-    SLInt32('movement'),
+    'luck' / Int32sl,
+    'movement' / Int32sl,
     Padding(4),
     Struct('resist',
-        SLInt32('fire'),
-        SLInt32('ice'),
-        SLInt32('wind'),
-        SLInt32('lightning')
+        'fire' / Int32sl,
+        'ice' / Int32sl,
+        'wind' / Int32sl,
+        'lightning' / Int32sl
     ),
 
     Pass
@@ -51,33 +51,33 @@ CharStats = Struct('stats',
 # row_size=292
 ItemModel = Struct('item',
     # looks like some kind of bit field/flags
-    ULInt32('type'),
+    'type' / Int32ul,
     # almost certainly some kind of id, maybe correlates to something else
     # like a foreign key
-    ULInt32('id'),
+    'id' / Int32ul,
     # str offset? seems to start at 0 and increase every time
-    ULInt32('name_offset'),
+    'name_offset' / Int32ul,
 
     # observed as all 0x00
     Padding(134),
-    # Magic('\0' * 134),
+    # Const('\0' * 134),
 
     # @0x92
     # yes, 3 of the exact same values in a row
-    ULInt32('flags_00'),
-    ULInt32('flags_01'),
-    ULInt32('flags_02'),
-    ULInt32('flags_03'),
+    'flags_00' / Int32ul,
+    'flags_01' / Int32ul,
+    'flags_02' / Int32ul,
+    'flags_03' / Int32ul,
 
     # always 0
-    Magic('\x00\x00'),
+    Const('\x00\x00'),
     # possibly the type of item (ex katanas, broadswords, syringes...), is the only value for now can relation this
-    ULInt16('game_effect_00'),
+    'game_effect_00' / Int16ul,
 
     # only seems to be 0, 1, or 99
-    ULInt16('max_count'),
-    ULInt32('buy price'),
-    ULInt32('sell_price'),
+    'max_count' / Int16ul,
+    'buy price' / Int32ul,
+    'sell_price' / Int32ul,
 
     CharStats
 )
@@ -86,28 +86,28 @@ AbilityModel = ItemModel
 
 CharaMonsterModel = Struct('charamonster',
     # flag field, use unknown
-    ULInt32('flag_00'),
+    'flag_00' / Int32ul,
 
     # this isn't certain, it seems to be unique but unconfirmed, and the rows
     # are completely in this order, it jumps around
-    ULInt16('id'),
+    'id' / Int16ul,
     # use unknown, but numbers all seem to be low, generally less than 20
-    ULInt16('dynamic_01'),
+    'dynamic_01' / Int16ul,
 
-    String('name', 32, padchar='\x00'),
+    'name' / String(32, padchar='\x00'),
 
     # always 0, except for CPUs/CPU candidate entries, where is small number
-    ULInt32('dynamic_10'),
-    ULInt16('flag_20'),
+    'dynamic_10' / Int32ul,
+    'flag_20' / Int16ul,
     # use unknown, numbers start small and increase slowly
-    ULInt16('dynamic_11'),
+    'dynamic_11' / Int16ul,
     Padding(2),
     # larger numbers, generally 300-400 ish, small variance
-    ULInt16('dynamic_12'),
+    'dynamic_12' / Int16ul,
     # very small numbers, less than 10
-    ULInt16('dynamic_13'),
+    'dynamic_13' / Int16ul,
     # usually 0, sometimes larger 200ish
-    ULInt16('dynamic_14'),
+    'dynamic_14' / Int16ul,
 
     # @56
     # observed as all 0x00
@@ -119,8 +119,8 @@ CharaMonsterModel = Struct('charamonster',
     # @168
     # only cpus/candidates have these, possibly voice/event data? or something
     # with the cpu form
-    ULInt32('flag_10'),
-    Array(11, ULInt32('dynamic_50')),
+    'flag_10' / Int32ul,
+    Array(11, 'dynamic_50' / Int32ul),
 
     Padding(152),
 
@@ -135,30 +135,30 @@ CharaMonsterModel = Struct('charamonster',
     # @1220
     # these always seem to be 0.07 and 0.15 respectively
     # not sure what the use is
-    LFloat32('fp_00'),
-    LFloat32('fp_01'),
+    'fp_00' / Float32l,
+    'fp_01' / Float32l,
 
-    ULInt32('dynamic_20'),
-    ULInt32('dynamic_21'),
-    ULInt32('dynamic_22'),
-    ULInt32('dynamic_23'),
-    ULInt32('stat_guard_points'),
+    'dynamic_20' / Int32ul,
+    'dynamic_21' / Int32ul,
+    'dynamic_22' / Int32ul,
+    'dynamic_23' / Int32ul,
+    'stat_guard_points' / Int32ul,
 
-    ULInt32('drop_exp'),
+    'drop_exp' / Int32ul,
     # @1252
-    ULInt32('drop_credits'),
+    'drop_credits' / Int32ul,
 
     # these are a total guess/gut feeling, should be x/100
-    ULInt32('drop_chance_any'),
-    ULInt32('drop_chance_item_00'),
-    ULInt32('drop_chance_item_01'),
-    ULInt32('drop_chance_item_02'),
+    'drop_chance_any' / Int32ul,
+    'drop_chance_item_00' / Int32ul,
+    'drop_chance_item_01' / Int32ul,
+    'drop_chance_item_02' / Int32ul,
 
     # @0x04f8
-    ULInt32('drop_item_00'),
-    ULInt32('drop_item_01'),
-    ULInt32('drop_item_02'),
-    Magic('\x00' * 4),
+    'drop_item_00' / Int32ul,
+    'drop_item_01' / Int32ul,
+    'drop_item_02' / Int32ul,
+    Const('\x00' * 4),
 
     # Value('v_drop_exp_bonus', lambda ctx: ctx.drop_exp * 1.3),
 
@@ -166,93 +166,93 @@ CharaMonsterModel = Struct('charamonster',
 )
 
 RemakeModel = Struct('remake',
-    ULInt32('name_offset'),
-    ULInt16('id'),
-    ULInt16('category_id'),
-    ULInt16('plan_item_id'),
-    ULInt16('result_id'),
+    'name_offset' / Int32ul,
+    'id' / Int16ul,
+    'category_id' / Int16ul,
+    'plan_item_id' / Int16ul,
+    'result_id' / Int16ul,
 
-    ULInt16('dynamic_00'),
+    'dynamic_00' / Int16ul,
     Padding(4),
-    ULInt16('dynamic_01'),
-    ULInt16('dynamic_02'),
+    'dynamic_01' / Int16ul,
+    'dynamic_02' / Int16ul,
     Padding(4),
 
     # @26
-    ULInt16('flag_10'),
-    ULInt32('flag_11'),
-    Magic('\x01'), Padding(3),
+    'flag_10' / Int16ul,
+    'flag_11' / Int32ul,
+    Const('\x01'), Padding(3),
 
-    ULInt16('dynamic_10'),
-    ULInt16('dynamic_11'),
-    ULInt16('dynamic_12'),
-    ULInt16('dynamic_13'),
+    'dynamic_10' / Int16ul,
+    'dynamic_11' / Int16ul,
+    'dynamic_12' / Int16ul,
+    'dynamic_13' / Int16ul,
 
     # @44
     Array(3,
         Struct('components',
-            ULInt16('item_id'),
-            ULInt16('count')
+            'item_id' / Int16ul,
+            'count' / Int16ul
         )
     ),
     Padding(8),
 
     # @64
-    ULInt32('dynamic_20'),
-    ULInt32('dynamic_21'),
-    ULInt32('dynamic_22'),
-    ULInt32('dynamic_23'),
+    'dynamic_20' / Int32ul,
+    'dynamic_21' / Int32ul,
+    'dynamic_22' / Int32ul,
+    'dynamic_23' / Int32ul,
     Padding(16),
 
     # @96
-    ULInt32('dynamic_30'),
-    ULInt32('dynamic_31'),
-    ULInt32('author_offset'),
-    ULInt32('desc_offset'),
+    'dynamic_30' / Int32ul,
+    'dynamic_31' / Int32ul,
+    'author_offset' / Int32ul,
+    'desc_offset' / Int32ul,
 
     Pass
 )
 
 TreasureModel = Struct('treasure',
-    ULInt32('id'),
+    'id' / Int32ul,
     Array(3, Struct('item',
-        ULInt32('id'),
-        ULInt32('drop_chance'),
-        ULInt32('flag_00'),
-        ULInt32('flag_01')
+        'id' / Int32ul,
+        'drop_chance' / Int32ul,
+        'flag_00' / Int32ul,
+        'flag_01' / Int32ul
     )),
 
     Pass
 )
 
 DungeonModel = Struct('dungeon',
-    ULInt16('id'),
+    'id' / Int16ul,
     # this is related to the environment of the dungeon in some way
-    ULInt16('env_effect_00'),
+    'env_effect_00' / Int16ul,
     Padding(6),
     # also related to the environment of the dungeon somehow, guessing the icon
     # based on what it's shared with
-    ULInt16('icon_id'),
+    'icon_id' / Int16ul,
     # the world map seems to use a coordinate system of:
     #  x=left<>right [0,~1600]
     #  y=top<>bottom [0,~1600]
-    ULInt32('map_pos_x'),
-    ULInt32('map_pos_y'),
+    'map_pos_x' / Int32ul,
+    'map_pos_y' / Int32ul,
     # always seems to be a multiple of 100
-    ULInt16('dynamic_02'),
-    ULInt16('dynamic_03'),
+    'dynamic_02' / Int16ul,
+    'dynamic_03' / Int16ul,
 
     # @24
-    ULInt32('name_offset'),
+    'name_offset' / Int32ul,
 
-    ULInt16('dynamic_10'),
-    ULInt16('dynamic_11'),
-    ULInt16('dynamic_12'),
+    'dynamic_10' / Int16ul,
+    'dynamic_11' / Int16ul,
+    'dynamic_12' / Int16ul,
     Padding(18),
 
     # @52
     # Search this 10 in sttreasure.gbin
-    Array(10, ULInt32('treasure_boxes')),
+    Array(10, 'treasure_boxes' / Int32ul),
     Array(5, Struct('hidden_treasure_boxes',
         TreasureModel
     )),
@@ -266,16 +266,16 @@ DungeonModel = Struct('dungeon',
         Array(15, Struct('monster_spawns',
             # always 0x01 00
             Padding(2),
-            ULInt16('dynamic_23'),
+            'dynamic_23' / Int16ul,
             Padding(2),
 
             # Array(28, ULInt16('dynamic_20')),
             Padding(56),
 
             Array(4, Struct('monsters',
-                ULInt16('id'),
-                ULInt16('dynamic_21'),
-                ULInt16('dynamic_22'),
+                'id' / Int16ul,
+                'dynamic_21' / Int16ul,
+                'dynamic_22' / Int16ul,
                 Padding(2)
             )),
             # always 0x00
@@ -297,22 +297,22 @@ DungeonModel = Struct('dungeon',
         Padding(520)
     ),
 
-    ULInt32('dynamic_99'),
+    'dynamic_99' / Int32ul,
     Padding(16),
 
     Pass
 )
 
 QuestModel = Struct('quest',
-    ULInt32('id'),
-    ULInt32('name_offset'),
+    'id' / Int32ul,
+    'name_offset' / Int32ul,
 
     BitStruct('type_flags',
         # there are quite a few flags in here that i am ignoring
         Padding(5),
-        Flag('non_repeatable'),
-        Flag('request_kill'),
-        Flag('request_item'),
+        'non_repeatable' / Flag,
+        'request_kill' / Flag,
+        'request_item' / Flag,
 
         Padding(8),
 
@@ -321,21 +321,21 @@ QuestModel = Struct('quest',
     Padding(2),
 
     Array(4, Struct('request_objects',
-        ULInt32('id'),
-        ULInt32('count'),
+        'id' / Int32ul,
+        'count' / Int32ul,
 
         Pass
     )),
 
     # @44
-    ULInt32('reward_credits'),
+    'reward_credits' / Int32ul,
     # i have no idea what this is used for, at all
-    ULInt8('dynamic_10'),
+    'dynamic_10' / Int8ul,
     Padding(3),
 
     Array(3, Struct('rewards',
-        ULInt32('id'),
-        ULInt32('count'),
+        'id' / Int32ul,
+        'count' / Int32ul,
 
         Pass
     )),
@@ -347,15 +347,15 @@ QuestModel = Struct('quest',
     #   2:  Lastation
     #   3:  Lowee
     #   4:  Arfoire/Others (the bad guys)
-    ULInt8('rep_gain_faction_id'),
-    ULInt8('rep_loss_faction_id'),
-    ULInt16('rep_flux_value'),
+    'rep_gain_faction_id' / Int8ul,
+    'rep_loss_faction_id' / Int8ul,
+    'rep_flux_value' / Int16ul,
 
     # this only seems to be used for colliseum quests
-    ULInt16('dungeon_id'),
-    ULInt16('dynamic_30'),
-    ULInt16('dynamic_31'),
-    ULInt16('dynamic_32'),
+    'dungeon_id' / Int16ul,
+    'dynamic_30' / Int16ul,
+    'dynamic_31' / Int16ul,
+    'dynamic_32' / Int16ul,
     Padding(8),
 
     # @96
@@ -363,50 +363,50 @@ QuestModel = Struct('quest',
     Padding(96),
 
     # @192
-    SLInt32('sponser_offset'),
-    SLInt32('client_offset'),
-    SLInt32('comment_offset'),
+    'sponser_offset' / Int32sl,
+    'client_offset' / Int32sl,
+    'comment_offset' / Int32sl,
 
     Pass
 )
 
 AvatarModel = Struct('avatar',
-    ULInt16('id'),
+    'id' / Int16ul,
 
     # this seems to be an id to another table (foreign key), or maybe a
     # sprite/model id
-    ULInt16('dynamic_00'),
+    'dynamic_00' / Int16ul,
 
-    ULInt32('name_offset'),
+    'name_offset' / Int32ul,
 
     # these appear to be related to whether the avatar is actually a character
     # or a system thing (like "Guild", "Shop", etc)
-    ULInt32('dynamic_10'),
-    ULInt32('dynamic_11'),
+    'dynamic_10' / Int32ul,
+    'dynamic_11' / Int32ul,
 
-    ULInt32('alt_name_offset'),
+    'alt_name_offset' / Int32ul,
 
     Pass
 )
 
 AvatarMessageModel = Struct('avtmsg',
-    ULInt32('id'),
+    'id' / Int32ul,
 
     # this is bizzare. it's always -1, except for a single row where it is the
     # offset to a single character string ("1")
-    SLInt32('one_offset'),
+    'one_offset' / Int32sl,
 
-    Array(5, ULInt32('message_offsets')),
+    Array(5, 'message_offsets' / Int32ul),
 
-    ULInt32('dynamic_10'),
+    'dynamic_10' / Int32ul,
     Padding(16),
 
     # @48
     Array(3, Struct('rewards',
         # this is probably not actually the count, since it would mean multiple
         # copies of plans are given
-        ULInt32('count'),
-        ULInt32('item_id'),
+        'count' / Int32ul,
+        'item_id' / Int32ul,
 
         Pass
     )),
@@ -416,28 +416,28 @@ AvatarMessageModel = Struct('avtmsg',
 
 AvatarDecModel = Struct('avtdec',
     Array(4, Struct('unknown_block_00',
-        ULInt32('dynamic_00'),
-        ULInt32('dynamic_01'),
-        ULInt32('dynamic_02'),
-        ULInt32('dynamic_03'),
-        SLInt32('dynamic_04'),
+        'dynamic_00' / Int32ul,
+        'dynamic_01' / Int32ul,
+        'dynamic_02' / Int32ul,
+        'dynamic_03' / Int32ul,
+        'dynamic_04' / Int32sl,
 
         Pass
     )),
 
-    ULInt32('dynamic_10'),
-    ULInt32('dynamic_11'),
-    ULInt32('dynamic_12'),
+    'dynamic_10' / Int32ul,
+    'dynamic_11' / Int32ul,
+    'dynamic_12' / Int32ul,
     # this is almost always 9 except for a few special cases
-    ULInt32('dynamic_13'),
-    SLInt32('avatar_id'),
+    'dynamic_13' / Int32ul,
+    'avatar_id' / Int32sl,
 
     # this definitely seems to be some kind of ID but is probably not the
     # primary key
-    ULInt32('avtmsg_id'),
-    ULInt16('map_pos_x'),
-    ULInt16('map_pos_y'),
-    ULInt32('required_item_id'),
+    'avtmsg_id' / Int32ul,
+    'map_pos_x' / Int16ul,
+    'map_pos_y' / Int16ul,
+    'required_item_id' / Int32ul,
 
     Pass
 )
