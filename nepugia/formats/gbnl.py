@@ -25,10 +25,10 @@
 from construct import *
 
 def GBNLFormat(row_model=None):
-    return Struct('gbnl',
+    return 'gbnl' / Struct(
         # note, footer struct size is 64
         Pointer(lambda ctx: -64,
-            Struct('footer',
+            'footer' / Struct(
                 'a_start' / Tell,
                 Const('GBNL'),
 
@@ -86,7 +86,7 @@ def GBNLFormat(row_model=None):
         ),
 
         Array(lambda ctx: ctx.footer.row_count,
-            Struct('rows',
+            'rows' / Struct(
                 Embedded(row_model),
                 Padding(lambda ctx: max(0, ctx._.footer.row_size - row_model.sizeof()))
             ) if row_model is not None else Padding(lambda ctx: ctx.footer.row_size)
@@ -99,10 +99,10 @@ def GBNLFormat(row_model=None):
         'a_strings_start' / Tell,
         Array(lambda ctx: ctx.footer.str_count,
             # CString('strings')
-            Struct('strings',
+            'strings' / Struct(
                 'start_offset' / Tell,
                 'v_relative_offset' / Computed(lambda ctx: ctx.start_offset - ctx._.a_strings_start),
-                CString('value'),
+                'value' / CString(),
                 'end_offset' / Tell,
             )
         ),

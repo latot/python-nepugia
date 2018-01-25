@@ -27,8 +27,8 @@ from construct import *
 # The format of the string storage format (the *.gstr files). This is where
 # the bulk of localization efforts would go, though there are localized strings
 # in other files as well.
-GSTLFormat = Struct('gstl',
-    Struct('header',
+GSTLFormat = Struct(
+    'header' / Struct(
         Const('GSTL'),
 
         Const('\x01\x00\x00\x00'),
@@ -59,7 +59,7 @@ GSTLFormat = Struct('gstl',
     ),
     # @0x44
     Array(lambda ctx: ctx.header.label_count,
-        Struct('labels',
+        'labels' / Struct(
             'id' / Int32ul,
             # starting offset of string
             'start_offset' / Int32ul,
@@ -72,13 +72,14 @@ GSTLFormat = Struct('gstl',
             'v_length' / Computed(lambda ctx: ctx.end_offset - ctx.start_offset),
         )
     ),
+    Padding(8),
     'a_strings_start' / Tell,
     Array(lambda ctx: ctx.header.str_count,
         # CString('strings')
-        Struct('strings',
+        'strings' / Struct(
             'start_offset' / Tell,
             'v_relative_offset' / Computed(lambda ctx: ctx.start_offset - ctx._.a_strings_start),
-            CString('value'),
+            'value' / CString(),
             'end_offset' / Tell,
         )
     )

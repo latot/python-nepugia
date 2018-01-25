@@ -24,7 +24,7 @@
 
 from construct import *
 
-CharStats = Struct('stats',
+CharStats = 'stats' / Struct(
     'hit_points' / Int32sl,
     Padding(4),
     'skill_points' / Int32sl,
@@ -38,7 +38,7 @@ CharStats = Struct('stats',
     'luck' / Int32sl,
     'movement' / Int32sl,
     Padding(4),
-    Struct('resist',
+    'resist' / Struct(
         'fire' / Int32sl,
         'ice' / Int32sl,
         'wind' / Int32sl,
@@ -49,7 +49,7 @@ CharStats = Struct('stats',
 )
 
 # row_size=292
-ItemModel = Struct('item',
+ItemModel = 'item' / Struct(
     # looks like some kind of bit field/flags
     'type' / Int32ul,
     # almost certainly some kind of id, maybe correlates to something else
@@ -84,7 +84,7 @@ ItemModel = Struct('item',
 
 AbilityModel = ItemModel
 
-CharaMonsterModel = Struct('charamonster',
+CharaMonsterModel = 'charamonster' / Struct(
     # flag field, use unknown
     'flag_00' / Int32ul,
 
@@ -165,7 +165,7 @@ CharaMonsterModel = Struct('charamonster',
     Pass
 )
 
-RemakeModel = Struct('remake',
+RemakeModel = 'remake' / Struct(
     'name_offset' / Int32ul,
     'id' / Int16ul,
     'category_id' / Int16ul,
@@ -190,7 +190,7 @@ RemakeModel = Struct('remake',
 
     # @44
     Array(3,
-        Struct('components',
+        'components' / Struct(
             'item_id' / Int16ul,
             'count' / Int16ul
         )
@@ -213,9 +213,9 @@ RemakeModel = Struct('remake',
     Pass
 )
 
-TreasureModel = Struct('treasure',
+TreasureModel = 'treasure' / Struct(
     'id' / Int32ul,
-    Array(3, Struct('item',
+    Array(3, 'item' / Struct(
         'id' / Int32ul,
         'drop_chance' / Int32ul,
         'flag_00' / Int32ul,
@@ -225,7 +225,7 @@ TreasureModel = Struct('treasure',
     Pass
 )
 
-DungeonModel = Struct('dungeon',
+DungeonModel = 'dungeon' / Struct(
     'id' / Int16ul,
     # this is related to the environment of the dungeon in some way
     'env_effect_00' / Int16ul,
@@ -253,7 +253,7 @@ DungeonModel = Struct('dungeon',
     # @52
     # Search this 10 in sttreasure.gbin
     Array(10, 'treasure_boxes' / Int32ul),
-    Array(5, Struct('hidden_treasure_boxes',
+    Array(5, 'hidden_treasure_boxes' / Struct(
         TreasureModel
     )),
 
@@ -262,8 +262,8 @@ DungeonModel = Struct('dungeon',
     # [0]= regular
     # [1]= +add enemies
     # [2]= +change dungeon
-    Array(3, Struct('monster_spawn_sets',
-        Array(15, Struct('monster_spawns',
+    Array(3, 'monster_spawn_sets' / Struct(
+        Array(15, 'monster_spawns' / Struct(
             # always 0x01 00
             Padding(2),
             'dynamic_23' / Int16ul,
@@ -272,7 +272,7 @@ DungeonModel = Struct('dungeon',
             # Array(28, ULInt16('dynamic_20')),
             Padding(56),
 
-            Array(4, Struct('monsters',
+            Array(4, 'monsters' / Struct(
                 'id' / Int16ul,
                 'dynamic_21' / Int16ul,
                 'dynamic_22' / Int16ul,
@@ -286,13 +286,13 @@ DungeonModel = Struct('dungeon',
     # @5212
     # array totals 2340 bytes
     # Gathering with Change-Items Off
-    Struct('gathering_off',
+    'gathering_off' / Struct(
         Array(10, TreasureModel),
         Padding(520)
     ),
 
     # Gathering with Change-Items On
-    Struct('gathering_on',
+    'gathering_on' / Struct(
         Array(5, TreasureModel),
         Padding(520)
     ),
@@ -303,11 +303,11 @@ DungeonModel = Struct('dungeon',
     Pass
 )
 
-QuestModel = Struct('quest',
+QuestModel = 'quest' / Struct(
     'id' / Int32ul,
     'name_offset' / Int32ul,
 
-    BitStruct('type_flags',
+    'type_flags' / BitStruct(
         # there are quite a few flags in here that i am ignoring
         Padding(5),
         'non_repeatable' / Flag,
@@ -320,7 +320,7 @@ QuestModel = Struct('quest',
     ),
     Padding(2),
 
-    Array(4, Struct('request_objects',
+    Array(4, 'request_objects' / Struct(
         'id' / Int32ul,
         'count' / Int32ul,
 
@@ -333,7 +333,7 @@ QuestModel = Struct('quest',
     'dynamic_10' / Int8ul,
     Padding(3),
 
-    Array(3, Struct('rewards',
+    Array(3, 'rewards' / Struct(
         'id' / Int32ul,
         'count' / Int32ul,
 
@@ -370,7 +370,7 @@ QuestModel = Struct('quest',
     Pass
 )
 
-AvatarModel = Struct('avatar',
+AvatarModel = 'avatar' / Struct(
     'id' / Int16ul,
 
     # this seems to be an id to another table (foreign key), or maybe a
@@ -389,7 +389,7 @@ AvatarModel = Struct('avatar',
     Pass
 )
 
-AvatarMessageModel = Struct('avtmsg',
+AvatarMessageModel = 'avtmsg' / Struct(
     'id' / Int32ul,
 
     # this is bizzare. it's always -1, except for a single row where it is the
@@ -402,7 +402,7 @@ AvatarMessageModel = Struct('avtmsg',
     Padding(16),
 
     # @48
-    Array(3, Struct('rewards',
+    Array(3, 'rewards' / Struct(
         # this is probably not actually the count, since it would mean multiple
         # copies of plans are given
         'count' / Int32ul,
@@ -414,8 +414,8 @@ AvatarMessageModel = Struct('avtmsg',
     Pass
 )
 
-AvatarDecModel = Struct('avtdec',
-    Array(4, Struct('unknown_block_00',
+AvatarDecModel = 'avtdec' / Struct(
+    Array(4, 'unknown_block_00' / Struct(
         'dynamic_00' / Int32ul,
         'dynamic_01' / Int32ul,
         'dynamic_02' / Int32ul,

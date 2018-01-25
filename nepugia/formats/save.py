@@ -25,8 +25,8 @@
 from construct import *
 from nepugia.formats.gbnl_models import *
 
-RB2_SAVFormat = Struct('rb2_sav',
-    Struct('header',
+RB2_SAVFormat = 'rb2_sav' / Struct(
+    'header' / Struct(
         'game_id' / Int16ul,
         'save_slot_id' / Int16ul,
 
@@ -44,7 +44,7 @@ RB2_SAVFormat = Struct('rb2_sav',
         Padding(3548),
         # @3584
 
-        Struct('game_stats',
+        'game_stats' / Struct(
             Padding(60),
 
             'battle_count' / Int32ul,
@@ -94,14 +94,14 @@ RB2_SAVFormat = Struct('rb2_sav',
         # Array(59, SLInt32('unknown_10')),
 
         # @3820
-        CString('chapter_title'),
+        'chapter_title' / CString(),
         Padding(lambda ctx: max(48 - (len(ctx.chapter_title)+1), 0)),
     ),
 
     Padding(20),
 
     # @3888
-    Array(22, Struct('characters',
+    Array(22, 'characters' / Struct(
         # struct total = 1288 bytes
 
         # this probably means something but i have no idea what
@@ -134,7 +134,7 @@ RB2_SAVFormat = Struct('rb2_sav',
         CharStats,
 
         Padding(20),
-        Struct('equipment',
+        'equipment' / Struct(
             'unknown_30' / Int32ul,
 
             'weapon_id' / Int32ul,
@@ -157,12 +157,12 @@ RB2_SAVFormat = Struct('rb2_sav',
 
     Padding(19564),
     # @51788
-    Struct('inventory',
+    'inventory' / Struct(
         'filled_slot_count' / Int32ul,
-        Array(3000, Struct('slots',
+        Array(3000, 'slots' / Struct(
             'item_id' / Int16ul,
             'count' / Int8ul,
-            BitStruct('flags',
+            'flags' / BitStruct(
                 Padding(5),
                 # this one seems exclusive to plans, but not all plans have it
                 'bitflag_00' / Flag,
@@ -193,7 +193,7 @@ RB2_SAVFormat = Struct('rb2_sav',
     Padding(20396),
 
     # @831664
-    Struct('footer',
+    'footer' / Struct(
         Const('\x01\x00\x00\x00'),
         Const('\x12\x32'),
         Const('\x50\x46'),
@@ -205,7 +205,7 @@ RB2_SAVFormat = Struct('rb2_sav',
     Padding(4),
 )
 
-SAVSlotFormat = Struct('savslot',
+SAVSlotFormat = 'savslot' / Struct(
     Const('SAVE0001'),
 
     # there might be some meaning to this, but is probably specific to ps3/vita
@@ -222,7 +222,7 @@ SAVSlotFormat = Struct('savslot',
     'save_icon_path' / String(64, padchar='\x00'),
     Padding(8),
 
-    Struct('timestamp',
+    'timestamp' / Struct(
         'year' / Int16ul,
         'month' / Int16ul,
         'day' / Int16ul,

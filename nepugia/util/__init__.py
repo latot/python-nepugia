@@ -38,9 +38,9 @@ except ImportError:
 from construct import Union, Int32ul, Struct, Int16ul
 
 def FourByteUnion(name):
-    return Union(name,
+    return name / Union(
         'u32' / Int32ul,
-        Struct('u16',
+        'u16' / Struct(
             'a' / Int16ul,
             'b' / Int16ul,
         ),

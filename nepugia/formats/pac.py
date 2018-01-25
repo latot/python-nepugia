@@ -28,8 +28,8 @@ from ..util.file_io import FileInFile
 
 # The format of the packed file container. Nearly all game files are stored
 # in side this container format.
-PACFormat = Struct('pac',
-    Struct('header',
+PACFormat = 'pac' / Struct(
+    'header' / Struct(
         Const('DW_PACK\0'),
         # this is a guess based on minor_id
         Const(0x00, 'major_id' / Int32ul),
@@ -41,10 +41,10 @@ PACFormat = Struct('pac',
     ),
 
     Array(lambda ctx: ctx.header.entry_count,
-        Struct('entries',
+        'entries' / Struct(
             Const('\x00\x00\x00\x00'),
             'id' / Int32ul,
-            String('name', 260, padchar='\x00'),
+            'name' / String(260, padchar='\x00'),
             Const('\x00\x00\x00\x00'),
             'stored_size' / Int32ul,
             'real_size' / Int32ul,
@@ -54,15 +54,15 @@ PACFormat = Struct('pac',
 
             If(lambda ctx: ctx.compression_flag,
                 OnDemand(Pointer(lambda ctx: ctx._.a_entry_list_end + ctx.offset,
-                    Struct('chunk_set',
-                        Struct('header',
+                    'chunk_set' / Struct(
+                        'header' / Struct(
                             # Const('\x34\x12\x00\x00'),
                             Const(0x1234, 'magic' / Int32ul),
                             'chunk_count' / Int32ul,
                             'chunk_size' / Int32ul,
                             'header_size' / Int32ul,
                         ),
-                        Array(lambda ctx: ctx.header.chunk_count, Struct('chunks',
+                        Array(lambda ctx: ctx.header.chunk_count, 'chunks' / Struct(
                             'real_size' / Int32ul,
                             'stored_size' / Int32ul,
                             'offset' / Int32ul,
