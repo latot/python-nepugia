@@ -28,57 +28,57 @@ from ..util.file_io import FileInFile
 
 # The format of the packed file container. Nearly all game files are stored
 # in side this container format.
-PACFormat = Struct('pac',
-    Struct('header',
-        Magic('DW_PACK\0'),
+PACFormat = 'pac' / Struct(
+    'header' / Struct(
+        Const('DW_PACK\0'),
         # this is a guess based on minor_id
-        Const(ULInt32('major_id'), 0x00),
-        ULInt32('entry_count'),
+        Const(0x00, 'major_id' / Int32ul),
+        'entry_count' / Int32ul,
         # this seems to correlate to the sequential files, eg:
         # GAME00000.pac has 0 here
         # GAME00001.pac has 1 here
-        ULInt32('minor_id'),
+        'minor_id' / Int32ul,
     ),
 
     Array(lambda ctx: ctx.header.entry_count,
-        Struct('entries',
-            Magic('\x00\x00\x00\x00'),
-            ULInt32('id'),
-            String('name', 260, padchar='\x00'),
-            Magic('\x00\x00\x00\x00'),
-            ULInt32('stored_size'),
-            ULInt32('real_size'),
+        'entries' / Struct(
+            Const('\x00\x00\x00\x00'),
+            'id' / Int32ul,
+            'name' / String(260, padchar=b'\x00'),
+            Const('\x00\x00\x00\x00'),
+            'stored_size' / Int32ul,
+            'real_size' / Int32ul,
             # all files are compressed
-            Const(ULInt32('compression_flag'), 1),
-            ULInt32('offset'),
+            Const(1, 'compression_flag' / Int32ul),
+            'offset' / Int32ul,
 
             If(lambda ctx: ctx.compression_flag,
                 OnDemand(Pointer(lambda ctx: ctx._.a_entry_list_end + ctx.offset,
-                    Struct('chunk_set',
-                        Struct('header',
-                            # Magic('\x34\x12\x00\x00'),
-                            Const(ULInt32('magic'), 0x1234),
-                            ULInt32('chunk_count'),
-                            ULInt32('chunk_size'),
-                            ULInt32('header_size'),
+                    'chunk_set' / Struct(
+                        'header' / Struct(
+                            # Const('\x34\x12\x00\x00'),
+                            Const(0x1234, 'magic' / Int32ul),
+                            'chunk_count' / Int32ul,
+                            'chunk_size' / Int32ul,
+                            'header_size' / Int32ul,
                         ),
-                        Array(lambda ctx: ctx.header.chunk_count, Struct('chunks',
-                            ULInt32('real_size'),
-                            ULInt32('stored_size'),
-                            ULInt32('offset'),
+                        Array(lambda ctx: ctx.header.chunk_count, 'chunks' / Struct(
+                            'real_size' / Int32ul,
+                            'stored_size' / Int32ul,
+                            'offset' / Int32ul,
 
-                            Value('vf_open', lambda ctx: lambda handle:
+                            'vf_open' / Computed(lambda ctx: lambda handle:
                                 FileInFile(handle, ctx._.header.header_size + ctx.offset,
                                     ctx.stored_size)),
                         )),
-                        Anchor('a_chunk_list_end'),
+                        'a_chunk_list_end' / Tell,
                     ),
                 )),
             ),
 
-            Value('vf_open', lambda ctx: lambda handle:
+            'vf_open' / Computed(lambda ctx: lambda handle:
                 FileInFile(handle, ctx._.a_entry_list_end + ctx.offset, ctx.stored_size)),
         )
     ),
-    Anchor('a_entry_list_end'),
+    'a_entry_list_end' / Tell,
 )
