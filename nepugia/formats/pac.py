@@ -44,7 +44,7 @@ PACFormat = 'pac' / Struct(
         'entries' / Struct(
             Const('\x00\x00\x00\x00'),
             'id' / Int32ul,
-            'name' / String(260, padchar='\x00'),
+            'name' / String(260, padchar=b'\x00'),
             Const('\x00\x00\x00\x00'),
             'stored_size' / Int32ul,
             'real_size' / Int32ul,

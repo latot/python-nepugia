@@ -107,7 +107,7 @@ RB2_SAVFormat = 'rb2_sav' / Struct(
         # this probably means something but i have no idea what
         # Array(4, 'unknown_10')),
         Padding(8),
-        'name' / String(32, padchar='\x00'),
+        'name' / String(32, padchar=b'\x00'),
 
         'xp_total' / Int32ul,
         'unknown_22' / Int16ul,
@@ -213,13 +213,13 @@ SAVSlotFormat = 'savslot' / Struct(
     Padding(32),
     Padding(4),
 
-    'title' / String(64, padchar='\x00', encoding='shift-jis'),
-    'progress' / String(128, padchar='\x00'),
-    'status' / String(128, padchar='\x00'),
+    'title' / String(64, padchar=b'\x00', encoding='shift-jis'),
+    'progress' / String(128, padchar=b'\x00'),
+    'status' / String(128, padchar=b'\x00'),
 
     Padding(384),
 
-    'save_icon_path' / String(64, padchar='\x00'),
+    'save_icon_path' / String(64, padchar=b'\x00'),
     Padding(8),
 
     'timestamp' / Struct(

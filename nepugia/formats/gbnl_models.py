@@ -43,9 +43,7 @@ CharStats = 'stats' / Struct(
         'ice' / Int32sl,
         'wind' / Int32sl,
         'lightning' / Int32sl
-    ),
-
-    Pass
+    )
 )
 
 # row_size=292
@@ -79,7 +77,13 @@ ItemModel = 'item' / Struct(
     'buy price' / Int32ul,
     'sell_price' / Int32ul,
 
-    CharStats
+    CharStats,
+
+    # not decodded yet
+    Padding(44),
+    # description offset
+    'description_offset' / Int32ul
+
 )
 
 AbilityModel = ItemModel
@@ -94,7 +98,7 @@ CharaMonsterModel = 'charamonster' / Struct(
     # use unknown, but numbers all seem to be low, generally less than 20
     'dynamic_01' / Int16ul,
 
-    'name' / String(32, padchar='\x00'),
+    'name' / String(32, padchar=b'\x00'),
 
     # always 0, except for CPUs/CPU candidate entries, where is small number
     'dynamic_10' / Int32ul,
