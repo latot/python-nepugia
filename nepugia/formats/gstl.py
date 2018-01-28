@@ -29,13 +29,13 @@ from construct import *
 # in other files as well.
 GSTLFormat = Struct(
     'header' / Struct(
-        Const('GSTL'),
+        Const(b'GSTL'),
 
-        Const('\x01\x00\x00\x00'),
-        Const('\x10\x00\x00\x00'),
-        Const('\x04\x00\x00\x00'),
-        Const('\x01\x00\x00\x00'),
-        Const('\x40\x00\x00\x00'),
+        Const(b'\x01\x00\x00\x00'),
+        Const(b'\x10\x00\x00\x00'),
+        Const(b'\x04\x00\x00\x00'),
+        Const(b'\x01\x00\x00\x00'),
+        Const(b'\x40\x00\x00\x00'),
 
         # number of str labels (ex: IDS_SOMETHING_OR_OTHER)
         # @0x18
@@ -43,8 +43,8 @@ GSTLFormat = Struct(
 
         # these are always observed to be 12, and 3 (respectively), use is
         # unknown (year and month of creation maybe?)
-        Const('\x0C\x00\x00\x00'),
-        Const('\x03\x00\x00\x00'),
+        Const(b'\x0C\x00\x00\x00'),
+        Const(b'\x03\x00\x00\x00'),
 
         # end of header maybe, of end of label list
         'end' / Int32ul,
@@ -54,7 +54,7 @@ GSTLFormat = Struct(
         'str_offset' / Int32ul,
 
         # 0x04 then zeros till @0x44
-        Const('\x04\x00\x00\x00'),
+        Const(b'\x04\x00\x00\x00'),
         Padding(16),
     ),
     # @0x44

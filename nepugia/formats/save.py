@@ -34,7 +34,7 @@ RB2_SAVFormat = 'rb2_sav' / Struct(
 
         'save_count' / Int32ul,
         Padding(4),
-        Const('\xD0\xB0\x0C\x00'),
+        Const(b'\xD0\xB0\x0C\x00'),
         # only seems to be 3, 7, or 10
         'unknown_01' / Int32ul,
         'cursor_pos_x' / Float32l,
@@ -194,11 +194,11 @@ RB2_SAVFormat = 'rb2_sav' / Struct(
 
     # @831664
     'footer' / Struct(
-        Const('\x01\x00\x00\x00'),
-        Const('\x12\x32'),
-        Const('\x50\x46'),
+        Const(b'\x01\x00\x00\x00'),
+        Const(b'\x12\x32'),
+        Const(b'\x50\x46'),
         Padding(8),
-        Const('\xFF\xCB\xE5\x00'),
+        Const(b'\xFF\xCB\xE5\x00'),
         Array(4, 'unknown_99' / Int16ul),
     ),
 
@@ -206,7 +206,7 @@ RB2_SAVFormat = 'rb2_sav' / Struct(
 )
 
 SAVSlotFormat = 'savslot' / Struct(
-    Const('SAVE0001'),
+    Const(b'SAVE0001'),
 
     # there might be some meaning to this, but is probably specific to ps3/vita
     # maybe CRCs?

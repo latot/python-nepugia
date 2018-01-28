@@ -30,7 +30,7 @@ def GBNLFormat(row_model=None):
         Pointer(lambda ctx: -64,
             'footer' / Struct(
                 'a_start' / Tell,
-                Const('GBNL'),
+                Const(b'GBNL'),
 
                 # # 0x01 00 00 00
                 # Const(ULInt32('const_00'), 0x01),
@@ -44,13 +44,13 @@ def GBNLFormat(row_model=None):
                 # Const(ULInt32('const_04'), 0x00),
                 # Padding(20),
 
-                Const('\x01\x00\x00\x00'),
-                Const('\x10\x00\x00\x00'),
-                Const('\x04\x00\x00\x00'),
+                Const(b'\x01\x00\x00\x00'),
+                Const(b'\x10\x00\x00\x00'),
+                Const(b'\x04\x00\x00\x00'),
                 # this is 1 if there are strings at the end of the file, and 0
                 # otherwise. not sure why since there is also a str_count field
                 'has_strings_flag' /Int32ul,
-                Const('\x00\x00\x00\x00'),
+                Const(b'\x00\x00\x00\x00'),
 
                 # @0x18
                 # possible string count?

@@ -30,7 +30,7 @@ from ..util.file_io import FileInFile
 # in side this container format.
 PACFormat = 'pac' / Struct(
     'header' / Struct(
-        Const('DW_PACK\0'),
+        Const(b'DW_PACK\0'),
         # this is a guess based on minor_id
         Const(0x00, 'major_id' / Int32ul),
         'entry_count' / Int32ul,
@@ -42,10 +42,10 @@ PACFormat = 'pac' / Struct(
 
     Array(lambda ctx: ctx.header.entry_count,
         'entries' / Struct(
-            Const('\x00\x00\x00\x00'),
+            Const(b'\x00\x00\x00\x00'),
             'id' / Int32ul,
             'name' / String(260, padchar=b'\x00'),
-            Const('\x00\x00\x00\x00'),
+            Const(b'\x00\x00\x00\x00'),
             'stored_size' / Int32ul,
             'real_size' / Int32ul,
             # all files are compressed
@@ -56,7 +56,7 @@ PACFormat = 'pac' / Struct(
                 OnDemand(Pointer(lambda ctx: ctx._.a_entry_list_end + ctx.offset,
                     'chunk_set' / Struct(
                         'header' / Struct(
-                            # Const('\x34\x12\x00\x00'),
+                            # Const(b'\x34\x12\x00\x00'),
                             Const(0x1234, 'magic' / Int32ul),
                             'chunk_count' / Int32ul,
                             'chunk_size' / Int32ul,

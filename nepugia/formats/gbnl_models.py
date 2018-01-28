@@ -58,7 +58,7 @@ ItemModel = 'item' / Struct(
 
     # observed as all 0x00
     Padding(134),
-    # Const('\0' * 134),
+    # Const(b'\0' * 134),
 
     # @0x92
     # yes, 3 of the exact same values in a row
@@ -68,7 +68,7 @@ ItemModel = 'item' / Struct(
     'flags_03' / Int32ul,
 
     # always 0
-    Const('\x00\x00'),
+    Const(b'\x00\x00'),
     # possibly the type of item (ex katanas, broadswords, syringes...), is the only value for now can relation this
     'game_effect_00' / Int16ul,
 
@@ -80,7 +80,8 @@ ItemModel = 'item' / Struct(
     CharStats,
 
     # not decodded yet
-    Padding(44),
+    # Padding(44),
+    'unknown_44' / RawCopy(Bytes(44)),
     # description offset
     'description_offset' / Int32ul
 
@@ -162,7 +163,7 @@ CharaMonsterModel = 'charamonster' / Struct(
     'drop_item_00' / Int32ul,
     'drop_item_01' / Int32ul,
     'drop_item_02' / Int32ul,
-    Const('\x00' * 4),
+    Const(b'\x00' * 4),
 
     # Value('v_drop_exp_bonus', lambda ctx: ctx.drop_exp * 1.3),
 
@@ -185,7 +186,7 @@ RemakeModel = 'remake' / Struct(
     # @26
     'flag_10' / Int16ul,
     'flag_11' / Int32ul,
-    Const('\x01'), Padding(3),
+    Padding(4),
 
     'dynamic_10' / Int16ul,
     'dynamic_11' / Int16ul,
@@ -212,9 +213,7 @@ RemakeModel = 'remake' / Struct(
     'dynamic_30' / Int32ul,
     'dynamic_31' / Int32ul,
     'author_offset' / Int32ul,
-    'desc_offset' / Int32ul,
-
-    Pass
+    'desc_offset' / Int32ul
 )
 
 TreasureModel = 'treasure' / Struct(
