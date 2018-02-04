@@ -44,7 +44,7 @@ PACFormat = 'pac' / Struct(
         'entries' / Struct(
             Const(b'\x00\x00\x00\x00'),
             'id' / Int32ul,
-            'name' / String(260, padchar=b'\x00'),
+            'name' / String(260),
             Const(b'\x00\x00\x00\x00'),
             'stored_size' / Int32ul,
             'real_size' / Int32ul,
@@ -53,7 +53,7 @@ PACFormat = 'pac' / Struct(
             'offset' / Int32ul,
 
             If(lambda ctx: ctx.compression_flag,
-                OnDemand(Pointer(lambda ctx: ctx._.a_entry_list_end + ctx.offset,
+                LazyField(Pointer(lambda ctx: ctx._.a_entry_list_end + ctx.offset,
                     'chunk_set' / Struct(
                         'header' / Struct(
                             # Const(b'\x34\x12\x00\x00'),

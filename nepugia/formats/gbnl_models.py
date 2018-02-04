@@ -99,7 +99,7 @@ CharaMonsterModel = 'charamonster' / Struct(
     # use unknown, but numbers all seem to be low, generally less than 20
     'dynamic_01' / Int16ul,
 
-    'name' / String(32, padchar=b'\x00'),
+    'name' / String(32),
 
     # always 0, except for CPUs/CPU candidate entries, where is small number
     'dynamic_10' / Int32ul,
@@ -454,7 +454,7 @@ CharaPlayerModel = 'charaplayer' / Struct(
     # use unknown, but numbers all seem to be low, generally less than 20
     'dynamic_01' / Int16ul,
 
-    'name' / String(32, padchar=b'\x00'),
+    'name' / String(32),
 
     # 1248 from here to end
     Padding(40),
