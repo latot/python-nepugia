@@ -26,7 +26,7 @@ from construct import *
 
 CharStats = 'stats' / Struct(
     'hit_points' / Int32sl,
-    Padding(4),
+    'unknown1' / Int32sl,
     'skill_points' / Int32sl,
     'strength' / Int32sl,
     'vitality' / Int32sl,
@@ -34,10 +34,10 @@ CharStats = 'stats' / Struct(
     'mentality' / Int32sl,
     'agility' / Int32sl,
     'technique' / Int32sl,
-    Padding(4),
+    'unknown2' / Int32sl,
     'luck' / Int32sl,
     'movement' / Int32sl,
-    Padding(4),
+    'unknown3' / Int32sl,
     'resist' / Struct(
         'fire' / Int32sl,
         'ice' / Int32sl,
@@ -445,12 +445,44 @@ AvatarDecModel = 'avtdec' / Struct(
     Pass
 )
 
+CharaPlayerModel = 'charaplayer' / Struct(
+    # flag field, use unknown
+    'flag_00' / Int32ul,
+
+    # this seems to be an id, and the level up data is constructed with it reading the file stcharalevelup + id
+    'id' / Int16ul,
+    # use unknown, but numbers all seem to be low, generally less than 20
+    'dynamic_01' / Int16ul,
+
+    'name' / String(32, padchar=b'\x00'),
+
+    # 1248 from here to end
+    Padding(40),
+    CharStats,
+    Padding(1140)
+)
+
+# Sorted by row, every row seems to be the amount added to the skill from one level to the next,
+# sorted from rows 0 to 97, how start at lvl 2 match to lvl 2 to 99
+CharaLevelUpModel = 'charalevelup' / Struct(
+    'unknown_01' / Int32ul,
+    CharStats,
+
+    # seems to be all 0
+    'unknown_02' / Int32sl,
+    'unknown_03' / Int32sl,
+    'unknown_04' / Int32sl,
+    'unknown_05' / Int32sl,
+    'unknown_06' / Int32sl
+)
+
 ROW_MODELS = {
     'none':         None,
     'stats':        CharStats,
     'ability':      AbilityModel,
     'item':         ItemModel,
     'charamonster': CharaMonsterModel,
+    'charaplayer':  CharaPlayerModel,
     'remake':       RemakeModel,
     'treasure':     TreasureModel,
     'dungeon':      DungeonModel,
