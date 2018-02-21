@@ -87,7 +87,10 @@ def GBNLFormat(row_model=None):
 
         Array(lambda ctx: ctx.footer.row_count,
             'rows' / Struct(
+                'start' / Tell,
+                Peek('data' / RawCopy(Bytes(row_model.sizeof()))),
                 Embedded(row_model),
+                'end' / Tell,
                 Padding(lambda ctx: max(0, ctx._.footer.row_size - row_model.sizeof()))
             ) if row_model is not None else Padding(lambda ctx: ctx.footer.row_size)
         ),

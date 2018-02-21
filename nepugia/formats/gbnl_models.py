@@ -22,11 +22,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+
+#Note, all strings use at end of b'\x00\x00'
+
 from construct import *
 
 CharStats = 'stats' / Struct(
     'hit_points' / Int32sl,
-    'unknown1' / Int32sl,
+    'unknown_1' / Int32sl,
     'skill_points' / Int32sl,
     'strength' / Int32sl,
     'vitality' / Int32sl,
@@ -34,10 +37,10 @@ CharStats = 'stats' / Struct(
     'mentality' / Int32sl,
     'agility' / Int32sl,
     'technique' / Int32sl,
-    'unknown2' / Int32sl,
+    'unknown_2' / Int32sl,
     'luck' / Int32sl,
     'movement' / Int32sl,
-    'unknown3' / Int32sl,
+    'unknown_3' / Int32sl,
     'resist' / Struct(
         'fire' / Int32sl,
         'ice' / Int32sl,
@@ -64,13 +67,15 @@ ItemModel = 'item' / Struct(
     # yes, 3 of the exact same values in a row
     'flags_00' / Int32ul,
     'flags_01' / Int32ul,
-    'flags_02' / Int32ul,
+    'flags_0021' / Int16ul,
+    'flags_0022' / Int16ul,
     'flags_03' / Int32ul,
 
     # always 0
     Const(b'\x00\x00'),
     # possibly the type of item (ex katanas, broadswords, syringes...), is the only value for now can relation this
-    'game_effect_00' / Int16ul,
+    #@164
+    'type_weapon' / Int16ul,
 
     # only seems to be 0, 1, or 99
     'max_count' / Int16ul,
@@ -81,10 +86,11 @@ ItemModel = 'item' / Struct(
 
     # not decodded yet
     # Padding(44),
-    'unknown_44' / RawCopy(Bytes(44)),
-    # description offset
-    'description_offset' / Int32ul
+    'unknown_44' / RawCopy(Bytes(42)),
 
+    'initial_attack' / Int16ul,
+    # description offset
+    'description_offset' / Int32ul,
 )
 
 AbilityModel = ItemModel
@@ -256,9 +262,7 @@ DungeonModel = 'dungeon' / Struct(
     # @52
     # Search this 10 in sttreasure.gbin
     Array(10, 'treasure_boxes' / Int32ul),
-    Array(5, 'hidden_treasure_boxes' / Struct(
-        TreasureModel
-    )),
+    Array(5, 'hidden_treasure_boxes' / TreasureModel),
 
     # @352
     # array totals 4860 bytes
@@ -289,16 +293,16 @@ DungeonModel = 'dungeon' / Struct(
     # @5212
     # array totals 2340 bytes
     # Gathering with Change-Items Off
-    'gathering_off' / Struct(
-        Array(10, TreasureModel),
+    Array(10, 'gathering_off' / Struct(
+        TreasureModel,
         Padding(520)
-    ),
+    ))
 
     # Gathering with Change-Items On
-    'gathering_on' / Struct(
-        Array(5, TreasureModel),
+    Array(5, 'gathering_on' / Struct(
+        TreasureModel,
         Padding(520)
-    ),
+    ))
 
     'dynamic_99' / Int32ul,
     Padding(16),
@@ -451,19 +455,22 @@ CharaPlayerModel = 'charaplayer' / Struct(
 
     # this seems to be an id, and the level up data is constructed with it reading the file stcharalevelup + id
     'id' / Int16ul,
-    # use unknown, but numbers all seem to be low, generally less than 20
     'dynamic_01' / Int16ul,
 
     'name' / String(32),
 
     # 1248 from here to end
-    Padding(40),
+    # Padding(40),
+    'unknown_01' / RawCopy(Bytes(40)),
     CharStats,
     Padding(1140)
+#    'unknown_02' / RawCopy(Bytes(148)),
+#    'weapon' / Int16ul,
+#    'unknown_03' / RawCopy(Bytes(990)),
 )
 
 # Sorted by row, every row seems to be the amount added to the skill from one level to the next,
-# sorted from rows 0 to 97, how start at lvl 2 match to lvl 2 to 99
+# sorted from rows 0 to 97, how start at lvl 2 match from lvl 2 to 99
 CharaLevelUpModel = 'charalevelup' / Struct(
     'unknown_01' / Int32ul,
     CharStats,
@@ -474,6 +481,25 @@ CharaLevelUpModel = 'charalevelup' / Struct(
     'unknown_04' / Int32sl,
     'unknown_05' / Int32sl,
     'unknown_06' / Int32sl
+)
+
+#size of 240
+SkillModel = 'skill' / Struct(
+    'id' / Int16ul,
+    'unknown_02' / Int16ul,
+    'name_offset' / Int32ul,
+#    'unknown' / RawCopy(Bytes(228)),
+    Array(4, 'unknown_03' / Int16ul),
+    'sp_cost' / Int16ul,
+    Array(9, 'unknown_04' / Int16ul),
+    'hit_count' / Int16ul,
+    'power' / Int16ul,
+    Array(5, 'unknown_05' / Int16ul),
+    'guard_damage' / Int16ul,
+    Array(79, 'unknown_06' / Int16ul),
+    'lvl' / Int16ul,
+    Array(12, 'unknown_07' / Int16ul),
+    'desc_offset' / Int32ul
 )
 
 ROW_MODELS = {
