@@ -534,18 +534,31 @@ CharaLevelUpModel = 'charalevelup' / Struct(
 #size of 240
 SkillModel = 'skill' / Struct(
     'id' / Int16ul,
-    'unknown_02' / Int16ul,
+    'unknown_01' / Int16ul,
     'name_offset' / Int32ul,
 #    'unknown' / RawCopy(Bytes(228)),
-    Array(4, 'unknown_03' / Int16ul),
+    Array(4, 'unknown_02' / Int16ul),
     'sp_cost' / Int16ul,
-    Array(9, 'unknown_04' / Int16ul),
+    Array(4, 'unknown_03' / Int16ul),
+    'unknown' / Int8ul,
+
+    # 0 - Neutral
+    # 1 - Fire
+    # 2 - Ice
+    # 3 - Wind
+    # 4 - Lightning
+    'affinity' / Int8ul,
+
+    Array(1, 'unknown_03' / Int16ul),
+    'range' / Int16ul,
+    Array(2, 'unknown_04' / Int16ul),
     'hit_count' / Int16ul,
     'power' / Int16ul,
     Array(5, 'unknown_05' / Int16ul),
     'guard_damage' / Int16ul,
-    Array(79, 'unknown_06' / Int16ul),
-    'lvl' / Int16ul,
+    Array(78, 'unknown_06' / Int16ul),
+    'player' / Int16ul,
+    'level' / Int16ul,
     Array(12, 'unknown_07' / Int16ul),
     'desc_offset' / Int32ul
 )
@@ -559,6 +572,11 @@ DiscItemModel = 'diskitem' / Struct(
     #Array(4, 'unknown' / Int16ul),
     Const(b'\x00' * 8),
     'desc_offset' / Int32ul
+)
+
+BlogModel = 'blog' / Struct(
+    'id' / Int32ul,
+    Array(13, 'unknown' / Int32ul)
 )
 
 ROW_MODELS = {
