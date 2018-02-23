@@ -53,6 +53,7 @@ CharStats = 'stats' / Struct(
 ItemModel = 'item' / Struct(
     # looks like some kind of bit field/flags
     'type' / Int32ul,
+
     # almost certainly some kind of id, maybe correlates to something else
     # like a foreign key
     'id' / Int32ul,
@@ -60,7 +61,9 @@ ItemModel = 'item' / Struct(
     'name_offset' / Int32ul,
 
     # observed as all 0x00
-    Padding(134),
+    #Padding(134),
+    'unknown_' / Peek(RawCopy(Bytes(137))),
+    Array(67, 'unknown' / Int16ul),
     # Const(b'\0' * 134),
 
     # @0x92
@@ -68,8 +71,7 @@ ItemModel = 'item' / Struct(
 
     'flags_00' / Int32ul,
     'flags_01' / Int32ul,
-    'flags_0021' / Int16ul,
-    'flags_0022' / Int16ul,
+    'flags_02' / Int32ul,
     'flags_03' / Int32ul,
 
     # always 0
@@ -131,7 +133,7 @@ ItemModel = 'item' / Struct(
     'chip_level' / Int16ul,
 
     # Both in the same position, depends of what is
-    'effect_chip' / Peek(Int16ul),
+    'ability_chip' / Peek(Int16ul),
     'initial_attack' / Int16ul,
 
     # description offset
@@ -545,6 +547,17 @@ SkillModel = 'skill' / Struct(
     Array(79, 'unknown_06' / Int16ul),
     'lvl' / Int16ul,
     Array(12, 'unknown_07' / Int16ul),
+    'desc_offset' / Int32ul
+)
+
+DiscItemModel = 'diskitem' / Struct(
+    'name' / String(40),
+    'id' / Int16ul,
+    'yellow_chip' / Int16ul,
+    'blue_chip' / Int16ul,
+    'red_chip' / Int16ul,
+    #Array(4, 'unknown' / Int16ul),
+    Const(b'\x00' * 8),
     'desc_offset' / Int32ul
 )
 
