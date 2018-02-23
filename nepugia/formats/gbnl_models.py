@@ -65,6 +65,7 @@ ItemModel = 'item' / Struct(
 
     # @0x92
     # yes, 3 of the exact same values in a row
+
     'flags_00' / Int32ul,
     'flags_01' / Int32ul,
     'flags_0021' / Int16ul,
@@ -73,9 +74,47 @@ ItemModel = 'item' / Struct(
 
     # always 0
     Const(b'\x00\x00'),
-    # possibly the type of item (ex katanas, broadswords, syringes...), is the only value for now can relation this
+
+    # type_item
     #@164
-    'type_weapon' / Int16ul,
+    # 0 - Unknown/Null
+    # 1 - Katanas (Neptune)
+    # 2 - Broadswords (Neptune)
+    # 3 - Spears (Vert)
+    # 4 - Short Swords (Noire)
+    # 5 - Hammers (Blanc)
+    # 6 - Beam Swords (Nepgear)
+    # 7 - Rifles (Uni)
+    # 8 - Staffs (Rom)
+    # 9 - Staffs (Ram)
+    # 12 - Syringes (Compa)
+    # 13 - Qatars (IF)
+    # 19 - Swords (Falcom)
+    # 20 - Staffs (MAGES)
+    # 21 - Dual Blades (CyberConnect2)
+    # 22 - Gemas (Broccoli)
+    # 23 - Swords (MarvelousAQL)
+    # 24 - Gloves (Tekken)
+    # 33 - Armor
+    # 34 - Ornament
+    # 35 - Costume
+    # 36 - Accessory
+    # 37 - Processor Unit C
+    # 38 - Processor Unit H
+    # 39 - Processor Unit B
+    # 40 - Processor Unit S
+    # 41 - Processor Unit W
+    # 42 - Processor Unit L
+    # 43 - Item Tools
+    # 44 - Item Materials
+    # 46 - Item Keys
+    # 47 - Plans
+    # 48 - Idea chip yellow
+    # 49 - Blue
+    # 50 - Red
+    # 51 - Item Keys Gifts
+
+    'type_item' / Int16ul,
 
     # only seems to be 0, 1, or 99
     'max_count' / Int16ul,
@@ -86,9 +125,15 @@ ItemModel = 'item' / Struct(
 
     # not decodded yet
     # Padding(44),
-    'unknown_44' / RawCopy(Bytes(42)),
+#    'unknown_44' / RawCopy(Bytes(42)),
+    Array(20, 'unknown_44' / Int16ul),
 
+    'chip_level' / Int16ul,
+
+    # Both in the same position, depends of what is
+    'effect_chip' / Peek(Int16ul),
     'initial_attack' / Int16ul,
+
     # description offset
     'description_offset' / Int32ul,
 )
@@ -293,16 +338,14 @@ DungeonModel = 'dungeon' / Struct(
     # @5212
     # array totals 2340 bytes
     # Gathering with Change-Items Off
-    Array(10, 'gathering_off' / Struct(
-        TreasureModel,
-        Padding(520)
-    ))
+    Array(10, 'gathering_off' / TreasureModel),
+
+    Padding(520),
 
     # Gathering with Change-Items On
-    Array(5, 'gathering_on' / Struct(
-        TreasureModel,
-        Padding(520)
-    ))
+    Array(5, 'gathering_on' / TreasureModel),
+
+    Padding(520),
 
     'dynamic_99' / Int32ul,
     Padding(16),
@@ -461,12 +504,15 @@ CharaPlayerModel = 'charaplayer' / Struct(
 
     # 1248 from here to end
     # Padding(40),
-    'unknown_01' / RawCopy(Bytes(40)),
+    Array(20, 'unknown_01' / Int16ul),
+#    'unknown_01' / RawCopy(Bytes(40)),
     CharStats,
-    Padding(1140)
+    Array(570, 'unknown_02' / Int16ul)
+#    Padding(1140)
 #    'unknown_02' / RawCopy(Bytes(148)),
 #    'weapon' / Int16ul,
 #    'unknown_03' / RawCopy(Bytes(990)),
+
 )
 
 # Sorted by row, every row seems to be the amount added to the skill from one level to the next,
