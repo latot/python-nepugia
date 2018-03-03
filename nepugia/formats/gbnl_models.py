@@ -27,30 +27,38 @@
 
 from construct import *
 
+#Start in system_db 60
+
 CharStats = 'stats' / Struct(
-    'hit_points' / Int32sl,
-    'unknown_1' / Int32sl,
-    'skill_points' / Int32sl,
-    'strength' / Int32sl,
-    'vitality' / Int32sl,
-    'intelligence' / Int32sl,
-    'mentality' / Int32sl,
-    'agility' / Int32sl,
-    'technique' / Int32sl,
-    'unknown_2' / Int32sl,
-    'luck' / Int32sl,
-    'movement' / Int32sl,
-    'unknown_3' / Int32sl,
+    'hit_points' / Int32sl, #HP
+    'unknown_1' / Int32sl, # AP -- Maybe Ability Points
+    'skill_points' / Int32sl, # SP
+    'strength' / Int32sl, #STR
+    'vitality' / Int32sl, #VIT
+    'intelligence' / Int32sl, #INT
+    'mentality' / Int32sl, #MEN
+    'agility' / Int32sl, #AGI
+    'technique' / Int32sl, #TEC
+    'unknown_2' / Int32sl, # ADV
+    'luck' / Int32sl, #LUK
+    'movement' / Int32sl, #MOV
     'resist' / Struct(
+        'neutral' / Int32sl,
         'fire' / Int32sl,
         'ice' / Int32sl,
         'wind' / Int32sl,
-        'lightning' / Int32sl
+        'lightning' / Int32sl,
+        'slice' / Int32sl,
+        'blunt' / Int32sl,
+        'pierce' / Int32sl,
+        'bullet' / Int32sl,
+        'beam' / Int32sl
     )
 )
 
 # row_size=292
 ItemModel = 'item' / Struct(
+    Peek(Array(300, 's' / Int8ul)),
     # looks like some kind of bit field/flags
     'type' / Int32ul,
 
@@ -62,21 +70,23 @@ ItemModel = 'item' / Struct(
 
     # observed as all 0x00
     #Padding(134),
-    'unknown_' / Peek(RawCopy(Bytes(137))),
-    Array(67, 'unknown' / Int16ul),
+#    'unknown_' / Peek(RawCopy(Bytes(137))),
+    Array(150, 'unknown' / Int8ul),
     # Const(b'\0' * 134),
 
     # @0x92
     # yes, 3 of the exact same values in a row
 
-    'flags_00' / Int32ul,
-    'flags_01' / Int32ul,
-    'flags_02' / Int32ul,
-    'flags_03' / Int32ul,
+#    'flags_00' / Int32ul,
+#    'flags_01' / Int32ul,
+#    'flags_02' / Int32ul,
+#    'flags_03' / Int32ul,
 
     # always 0
     Const(b'\x00\x00'),
 
+    # Start in 195 in system_db
+    # Maybe '-' means Null, or the first text is excluded, 0 exclude the text options
     # type_item
     #@164
     # 0 - Unknown/Null
@@ -128,19 +138,19 @@ ItemModel = 'item' / Struct(
     # not decodded yet
     # Padding(44),
 #    'unknown_44' / RawCopy(Bytes(42)),
-    Array(20, 'unknown_44' / Int16ul),
+    Array(20, 'unknown_44' / Int8ul),
 
     'chip_level' / Int16ul,
 
-    # Both in the same position, depends of what is
-    'ability_chip' / Peek(Int16ul),
-    'initial_attack' / Int16ul,
+    # This can be:
+    # Weapons - Initial Attack - Skill
+    # Idea Chips - Ability
+    # Consumables - Skill
+    'ability' / Int16ul,
 
     # description offset
-    'description_offset' / Int32ul,
+    'desc_offset' / Int32ul,
 )
-
-AbilityModel = ItemModel
 
 CharaMonsterModel = 'charamonster' / Struct(
     # flag field, use unknown
@@ -149,8 +159,10 @@ CharaMonsterModel = 'charamonster' / Struct(
     # this isn't certain, it seems to be unique but unconfirmed, and the rows
     # are completely in this order, it jumps around
     'id' / Int16ul,
-    # use unknown, but numbers all seem to be low, generally less than 20
-    'dynamic_01' / Int16ul,
+
+    # Type of monster
+    # Start in system_db 83
+    'type' / Int16ul,
 
     'name' / String(32),
 
@@ -172,7 +184,6 @@ CharaMonsterModel = 'charamonster' / Struct(
     Padding(24),
 
     CharStats,
-    Padding(20),
 
     # @168
     # only cpus/candidates have these, possibly voice/event data? or something
@@ -216,11 +227,9 @@ CharaMonsterModel = 'charamonster' / Struct(
     'drop_item_00' / Int32ul,
     'drop_item_01' / Int32ul,
     'drop_item_02' / Int32ul,
-    Const(b'\x00' * 4),
+    'unknown' / Int32ul,
 
     # Value('v_drop_exp_bonus', lambda ctx: ctx.drop_exp * 1.3),
-
-    Pass
 )
 
 RemakeModel = 'remake' / Struct(
@@ -393,6 +402,7 @@ QuestModel = 'quest' / Struct(
     )),
 
     # @76
+    # Start in 22 in system_db
     # faction IDs:
     #   0:  Planeptune
     #   1:  Leanbox
@@ -509,7 +519,7 @@ CharaPlayerModel = 'charaplayer' / Struct(
     Array(20, 'unknown_01' / Int16ul),
 #    'unknown_01' / RawCopy(Bytes(40)),
     CharStats,
-    Array(570, 'unknown_02' / Int16ul)
+    Array(560, 'unknown_02' / Int16ul)
 #    Padding(1140)
 #    'unknown_02' / RawCopy(Bytes(148)),
 #    'weapon' / Int16ul,
@@ -517,18 +527,14 @@ CharaPlayerModel = 'charaplayer' / Struct(
 
 )
 
+## Lets think for now both have the same structure
+CharaPlayerModel = CharaMonsterModel
+
 # Sorted by row, every row seems to be the amount added to the skill from one level to the next,
 # sorted from rows 0 to 97, how start at lvl 2 match from lvl 2 to 99
 CharaLevelUpModel = 'charalevelup' / Struct(
     'unknown_01' / Int32ul,
-    CharStats,
-
-    # seems to be all 0
-    'unknown_02' / Int32sl,
-    'unknown_03' / Int32sl,
-    'unknown_04' / Int32sl,
-    'unknown_05' / Int32sl,
-    'unknown_06' / Int32sl
+    CharStats
 )
 
 #size of 240
@@ -539,9 +545,36 @@ SkillModel = 'skill' / Struct(
 #    'unknown' / RawCopy(Bytes(228)),
     Array(4, 'unknown_02' / Int16ul),
     'sp_cost' / Int16ul,
-    Array(4, 'unknown_03' / Int16ul),
-    'unknown' / Int8ul,
+    'exe_cost' / Int16ul,
+    'lily_rank' / Int16ul,
+    Array(3, 'unknown_022' / Int8ul),
 
+    # Start in 172 in system_db
+    # 0 - Rush Combo
+    # 1 - Power Combo
+    # 2 - Break Combo
+    # 3 - SP Attack
+    # 5 - Heal
+    # 6 - EXE Drive
+    # 7 -
+    # 8 - Support
+    # 9 - Formation Skill
+    # 10 - Coupling Skill
+    # 11 -
+    # 12 - Item Consumable
+    'type' / Int8ul,
+
+    # Start in 186 in system_db
+    # 0 - Physical Attack
+    # 1 - Magical Attack
+    # 4 - Heal
+    # 5 - Revive
+    # 6 - Assist
+    # 7 - Taboo Staff (Dungeon)
+    # 8 - Eject Button (Dungeon)
+    'category' / Int8ul,
+
+    # Start in 48 in system_db
     # 0 - Neutral
     # 1 - Fire
     # 2 - Ice
@@ -551,17 +584,71 @@ SkillModel = 'skill' / Struct(
 
     Array(1, 'unknown_03' / Int16ul),
     'range' / Int16ul,
-    Array(2, 'unknown_04' / Int16ul),
+
+    # in circular effect is radius
+    # in square map location is an id (or codded data) of the affected squares
+    'scope' / Int8ul,
+    # 0 - Square Map Location
+    # 128 (10000000) - Circular Effect (Maybe just read the first bit)
+    'scope_type' / Int8ul,
+
+    Array(2, 'unknown_04' / Int8ul),
     'hit_count' / Int16ul,
     'power' / Int16ul,
     Array(5, 'unknown_05' / Int16ul),
     'guard_damage' / Int16ul,
-    Array(78, 'unknown_06' / Int16ul),
+
+    # Maybe there is groups of 4 there is always one 0 between the types
+    # Poison in 2 3 4
+    # Paralyze in 6 7 8
+    # STR 22 23 24
+    # VIT 26 27 28
+    # INT 30 31 32
+    # MEN 34 35 36
+    # AGI 38 39 40
+    # TEC 42 43 44
+    ## ADV 46 47 48
+    ## LUK 50 51 52
+    # MOV 54 55 56
+
+    #"100: b'Poison'"
+    #"101: b'Paralysis'"
+    #"102: b'Seal'"
+    #"103: b'Healing'"
+    #"104: b'Virus'"
+    #"105: b'STR'"
+    #"106: b'VIT'"
+    #"107: b'INT'"
+    #"108: b'MEN'"
+    #"109: b'AGI'"
+    #"110: b'TEC'"
+    #"111: b'AVD'"
+    #"112: b'LUK'"
+    #"113: b'MOV'"
+    #"114: b'Neutral Resist'"
+    #"115: b'Fire Resist'"
+    #"116: b'Ice Resist'"
+    #"117: b'Wind Resist'"
+    #"118: b'Lightning Resist'"
+
+    #This array is betwen 4 and 1, still we don't know what is the correct interpretation
+    Array(4, 'unknown_06' / Int8ul),
+    Array(19, 'effects' / Struct(
+        'unknown' / Int32sl,
+        'stat' / Int32sl        
+    )),
+    Array(0, 'unknown_07' / Int8ul),
+
     'player' / Int16ul,
     'level' / Int16ul,
-    Array(12, 'unknown_07' / Int16ul),
+    Array(2, 'unknown_08' / Int16ul),
+    # Only with Coupling Skills, maybe has length 6, sorting the formation in Player1 Partner1 Player2 Partner2 Player3 Partner3
+    Array(5, 'coupling_player' / Int16ul),
+    Array(5, 'unknown_09' / Int16ul), 
     'desc_offset' / Int32ul
 )
+
+AbilityModel = ItemModel
 
 DiscItemModel = 'diskitem' / Struct(
     'name' / String(40),
@@ -577,6 +664,20 @@ DiscItemModel = 'diskitem' / Struct(
 BlogModel = 'blog' / Struct(
     'id' / Int32ul,
     Array(13, 'unknown' / Int32ul)
+)
+
+SkillScopeModel = 'skillscope' / Struct(
+    'id' / Int8ul,
+#    Array(1, 'u' / Int8ul),
+#    Array(28, 'unknown' / Int8ul),
+#    'scope' / Bytes(31)
+#    Array(2, 'v' / Int8ul)
+    Array(31, 'unknown' / Int8ul)
+)
+
+BattleAIModel = 'battleai' / Struct(
+    'id' / Int32ul,
+    Array(8, 'unknown' / Int32ul)
 )
 
 ROW_MODELS = {
