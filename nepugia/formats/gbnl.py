@@ -23,6 +23,7 @@
 # SOFTWARE.
 
 from construct import *
+from nepugia.common.construct import *
 
 def GBNLFormat(row_model=None):
     return 'gbnl' / Struct(
@@ -47,6 +48,7 @@ def GBNLFormat(row_model=None):
                 Const(b'\x01\x00\x00\x00'),
                 Const(b'\x10\x00\x00\x00'),
                 Const(b'\x04\x00\x00\x00'),
+
                 # this is 1 if there are strings at the end of the file, and 0
                 # otherwise. not sure why since there is also a str_count field
                 'has_strings_flag' /Int32ul,
@@ -105,7 +107,7 @@ def GBNLFormat(row_model=None):
             'strings' / Struct(
                 'start_offset' / Tell,
                 'v_relative_offset' / Computed(lambda ctx: ctx.start_offset - ctx._.a_strings_start),
-                'value' / CString(),
+                'value' / CString(type_strings),
                 'end_offset' / Tell,
             )
         ),

@@ -24,6 +24,7 @@
 
 from construct import *
 from nepugia.formats.gbnl_models import *
+from nepugia.common.construct import *
 
 RB2_SAVFormat = 'rb2_sav' / Struct(
     'header' / Struct(
@@ -94,7 +95,7 @@ RB2_SAVFormat = 'rb2_sav' / Struct(
         # Array(59, SLInt32('unknown_10')),
 
         # @3820
-        'chapter_title' / CString(),
+        'chapter_title' / CString(type_strings),
         Padding(lambda ctx: max(48 - (len(ctx.chapter_title)+1), 0)),
     ),
 
@@ -107,7 +108,7 @@ RB2_SAVFormat = 'rb2_sav' / Struct(
         # this probably means something but i have no idea what
         # Array(4, 'unknown_10')),
         Padding(8),
-        'name' / String(32),
+        'name' / PaddedString(32, type_strings),
 
         'xp_total' / Int32ul,
         'unknown_22' / Int16ul,
@@ -213,13 +214,13 @@ SAVSlotFormat = 'savslot' / Struct(
     Padding(32),
     Padding(4),
 
-    'title' / String(64, encoding='shift-jis'),
-    'progress' / String(128),
-    'status' / String(128),
+    'title' / PaddedString(64, 'shift-jis'),
+    'progress' / PaddedString(128, type_strings),
+    'status' / PaddedString(128, type_strings),
 
     Padding(384),
 
-    'save_icon_path' / String(64),
+    'save_icon_path' / PaddedString(64, type_strings),
     Padding(8),
 
     'timestamp' / Struct(

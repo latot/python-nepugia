@@ -23,12 +23,14 @@
 # SOFTWARE.
 
 from construct import *
+from nepugia.common.construct import *
 
 # The format of the string storage format (the *.gstr files). This is where
 # the bulk of localization efforts would go, though there are localized strings
 # in other files as well.
 GSTLFormat = Struct(
     'header' / Struct(
+        Const(b'\xef\xbb\xbf'),
         Const(b'GSTL'),
 
         Const(b'\x01\x00\x00\x00'),
@@ -79,7 +81,7 @@ GSTLFormat = Struct(
         'strings' / Struct(
             'start_offset' / Tell,
             'v_relative_offset' / Computed(lambda ctx: ctx.start_offset - ctx._.a_strings_start),
-            'value' / CString(),
+            'value' / CString(type_strings),
             'end_offset' / Tell,
         )
     )

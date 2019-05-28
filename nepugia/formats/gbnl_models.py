@@ -26,6 +26,7 @@
 #Note, all strings use at end of b'\x00\x00'
 
 from construct import *
+from nepugia.common.construct import *
 
 #Start in system_db 60
 
@@ -83,7 +84,8 @@ ItemModel = 'item' / Struct(
 #    'flags_03' / Int32ul,
 
     # always 0
-    Const(b'\x00\x00'),
+    #Const(b'\x00\x00'),
+    Padding(2),
 
     # Start in 195 in system_db
     # Maybe '-' means Null, or the first text is excluded, 0 exclude the text options
@@ -164,7 +166,7 @@ CharaMonsterModel = 'charamonster' / Struct(
     # Start in system_db 83
     'type' / Int16ul,
 
-    'name' / String(32),
+    'name' / PaddedString(32, type_strings),
 
     # always 0, except for CPUs/CPU candidate entries, where is small number
     'dynamic_10' / Int32ul,
@@ -512,7 +514,7 @@ CharaPlayerModel = 'charaplayer' / Struct(
     'id' / Int16ul,
     'dynamic_01' / Int16ul,
 
-    'name' / String(32),
+    'name' / PaddedString(32, type_strings),
 
     # 1248 from here to end
     # Padding(40),
@@ -554,24 +556,28 @@ SkillModel = 'skill' / Struct(
     # 1 - Power Combo
     # 2 - Break Combo
     # 3 - SP Attack
-    # 5 - Heal
+    # 4 - Defense Skill
+    # 5 - Heal Skill
     # 6 - EXE Drive
-    # 7 -
+    # 7 - Assist Attack
     # 8 - Support
     # 9 - Formation Skill
     # 10 - Coupling Skill
-    # 11 -
+    # 11 - Special Skill
     # 12 - Item Consumable
     'type' / Int8ul,
 
     # Start in 186 in system_db
-    # 0 - Physical Attack
-    # 1 - Magical Attack
+
+    # 0 - Phys. Attack
+    # 1 - Mag. Attack
+    # 2 - Phys. Link
+    # 3 - Mag. Link
     # 4 - Heal
     # 5 - Revive
     # 6 - Assist
-    # 7 - Taboo Staff (Dungeon)
-    # 8 - Eject Button (Dungeon)
+    # 7 - Repop (Taboo Staff, Dungeon)
+    # 8 - Escape (Eject Button, Dungeon)
     'category' / Int8ul,
 
     # Start in 48 in system_db
@@ -651,13 +657,13 @@ SkillModel = 'skill' / Struct(
 AbilityModel = ItemModel
 
 DiscItemModel = 'diskitem' / Struct(
-    'name' / String(40),
+    'name' / PaddedString(40, type_strings),
     'id' / Int16ul,
     'yellow_chip' / Int16ul,
     'blue_chip' / Int16ul,
     'red_chip' / Int16ul,
-    #Array(4, 'unknown' / Int16ul),
-    Const(b'\x00' * 8),
+    Array(4, 'unknown' / Int16ul),
+    #Const(b'\x00' * 8),
     'desc_offset' / Int32ul
 )
 

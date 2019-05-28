@@ -69,7 +69,7 @@ def extract_pac_file(src_file, dest_dir):
                                     hc.decompress_stream(
                                         chunk_handle, target_file, chunk.real_size)
                                 except Exception as err:
-                                    print err
+                                    print(err)
                     else:
                         chunked_copy(entry_handle.read, target_file.write)
 
