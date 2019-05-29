@@ -539,6 +539,11 @@ CharaLevelUpModel = 'charalevelup' / Struct(
     CharStats
 )
 
+SubEffect = Struct(
+    'value1' / Int32sl,
+    'value2' / Int32sl
+)
+
 #size of 240
 SkillModel = 'skill' / Struct(
     'id' / Int16ul,
@@ -548,6 +553,7 @@ SkillModel = 'skill' / Struct(
     Array(4, 'unknown_02' / Int16ul),
     'sp_cost' / Int16ul,
     'exe_cost' / Int16ul,
+    # Seems to be lily_rank for special skills, and cp_cost for combos
     'lily_rank' / Int16ul,
     Array(3, 'unknown_022' / Int8ul),
 
@@ -602,20 +608,8 @@ SkillModel = 'skill' / Struct(
     'hit_count' / Int16ul,
     'power' / Int16ul,
     Array(5, 'unknown_05' / Int16ul),
-    'guard_damage' / Int16ul,
-
-    # Maybe there is groups of 4 there is always one 0 between the types
-    # Poison in 2 3 4
-    # Paralyze in 6 7 8
-    # STR 22 23 24
-    # VIT 26 27 28
-    # INT 30 31 32
-    # MEN 34 35 36
-    # AGI 38 39 40
-    # TEC 42 43 44
-    ## ADV 46 47 48
-    ## LUK 50 51 52
-    # MOV 54 55 56
+    'guard_damage' / Int16ul,    
+    'unknown_06' / Int32ul,
 
     #"100: b'Poison'"
     #"101: b'Paralysis'"
@@ -637,13 +631,27 @@ SkillModel = 'skill' / Struct(
     #"117: b'Wind Resist'"
     #"118: b'Lightning Resist'"
 
-    #This array is betwen 4 and 1, still we don't know what is the correct interpretation
-    Array(4, 'unknown_06' / Int8ul),
-    Array(19, 'effects' / Struct(
-        'unknown' / Int32sl,
-        'stat' / Int32sl        
-    )),
-    Array(0, 'unknown_07' / Int8ul),
+    'effect' / Struct(
+        'Poison' / SubEffect,
+        'Paralysis' / SubEffect,
+        'Seal' / SubEffect,
+        'Healing' / SubEffect,
+        'Virus' / SubEffect,
+        'STR' / SubEffect,
+        'VIT' / SubEffect,
+        'INT' / SubEffect,
+        'MEN' / SubEffect,
+        'AGI' / SubEffect,
+        'TEC' / SubEffect,
+        'AVD' / SubEffect,
+        'LUK' / SubEffect,
+        'MOV' / SubEffect,
+        'Neutral_Resist' / SubEffect,
+        'Fire_Resist' / SubEffect,
+        'Ice_Resist' / SubEffect,
+        'Wind_Resist' / SubEffect,
+        'Lightning_Resist' / SubEffect
+    ),
 
     'player' / Int16ul,
     'level' / Int16ul,

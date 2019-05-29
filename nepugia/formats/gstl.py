@@ -30,7 +30,6 @@ from nepugia.common.construct import *
 # in other files as well.
 GSTLFormat = Struct(
     'header' / Struct(
-        Const(b'\xef\xbb\xbf'),
         Const(b'GSTL'),
 
         Const(b'\x01\x00\x00\x00'),
