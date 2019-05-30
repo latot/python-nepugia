@@ -540,8 +540,9 @@ CharaLevelUpModel = 'charalevelup' / Struct(
 )
 
 SubEffect = Struct(
-    'value1' / Int32sl,
-    'value2' / Int32sl
+    'value' / Int32sl,
+    #This maybe is the chance to activate the effect
+    'unknown' / Int32sl
 )
 
 #size of 240
@@ -686,7 +687,7 @@ SkillScopeModel = 'skillscope' / Struct(
 #    Array(28, 'unknown' / Int8ul),
 #    'scope' / Bytes(31)
 #    Array(2, 'v' / Int8ul)
-    Array(31, 'unknown' / Int8ul)
+    Array(31, ('unknown' / Int8ul))
 )
 
 BattleAIModel = 'battleai' / Struct(
