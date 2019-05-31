@@ -681,13 +681,15 @@ BlogModel = 'blog' / Struct(
     Array(13, 'unknown' / Int32ul)
 )
 
+ScopeLine = Struct(
+    '_first' / BitsSwapped(Int8ul),
+    '_second' / BitsSwapped(Int8ul),
+    'line' / Computed(lambda this: "{}{}".format(str(bin(this._first)[2:]).zfill(8), str(bin(this._second)[2:]).zfill(8)))
+)
+
 SkillScopeModel = 'skillscope' / Struct(
-    'id' / Int8ul,
-#    Array(1, 'u' / Int8ul),
-#    Array(28, 'unknown' / Int8ul),
-#    'scope' / Bytes(31)
-#    Array(2, 'v' / Int8ul)
-    Array(31, ('unknown' / Int8ul))
+    'id' / Int16ul,
+    Array(15, 'lines' / ScopeLine)
 )
 
 BattleAIModel = 'battleai' / Struct(
