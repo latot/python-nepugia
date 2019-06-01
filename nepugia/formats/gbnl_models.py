@@ -72,7 +72,15 @@ ItemModel = 'item' / Struct(
     # observed as all 0x00
     #Padding(134),
 #    'unknown_' / Peek(RawCopy(Bytes(137))),
-    Array(150, 'unknown' / Int8ul),
+#    Array(150, 'unknown' / Int8ul),
+
+    Array(143, 'unknown__01' / Int8ul),
+
+    #Here the character who can use the item, seems to works as bits, if is 0 can't use it, if 1 can use
+    #Ex from Uni, "Long Range Rifle", val 128 -> 10000000, pos 8, so the character with id 8 can use the item, in this case we can confirm is Uni
+    'chara_user' / Int16ul,
+
+    Array(5, 'unknown__02' / Int8ul),
     # Const(b'\0' * 134),
 
     # @0x92
