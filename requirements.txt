@@ -1,2 +1,2 @@
-construct>=2.8
+construct==2.9.38
 bitarray==0.8.1
